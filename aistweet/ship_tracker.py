@@ -5,6 +5,7 @@ import time
 from pkg_resources import resource_filename
 
 import flag
+import geopy
 from pyais.stream import UDPStream
 
 from aistweet.units import m_to_lat, m_to_lon
@@ -141,6 +142,68 @@ class ShipTracker(object):
             )
 
             return (lat + lat_offset, lon + lon_offset)
+
+    def crossing_time(self, latitude, longitude, direction):
+        with self.lock:
+            # check for speed above a nominal threhsold
+            speed = self.ships[mmsi]["speed"]
+            if speed < 0.2:
+                return None
+
+            ship_lat, ship_lon = center_coords(mmsi)
+            ship_dir = self.ships[mmsi]["course"]
+
+            # compute intersection point (http://www.movable-type.co.uk/scripts/latlong.html)
+            d_12 = 2.0 * math.asin(
+                math.sqrt(
+                    math.sin((latitude - ship_lat) / 2.0) ** 2
+                    + math.cos(latitude)
+                    * math.cos(ship_lat)
+                    * math.sin((longitude - ship_lon) / 2.0) ** 2
+                )
+            )
+
+            t_a = math.acos(
+                (math.sin(ship_lat) - math.sin(latitude) * math.cos(d_12))
+                / (math.sin(d_12) * math.cos(latitude))
+            )
+            t_b = math.acos(
+                (math.sin(latitude) - math.sin(ship_lat) * math.cos(d_12))
+                / (math.sin(d_12) * math.cos(ship_lat))
+            )
+
+            if math.sin(ship_lon - longitude) > 0.0:
+                t_12 = t_a
+                t_21 = math.tau - t_b
+            else:
+                t_12 = math.tau - t_a
+                t_21 = t_b
+
+            a_1 = math.radians(direction) - t_12
+            a_2 = t_21 - math.radians(ship_dir)
+            a_3 = math.acos(
+                -math.cos(a_1) * math.cos(a_2)
+                + math.sin(a_1) * math.sin(a_2) * math.cos(d_12)
+            )
+            d_13 = math.atan2(
+                math.sin(d_12) * math.sin(a_1) * math.sin(a_2),
+                math.cos(a_2) + math.cos(a_1) * math.cos(a_3),
+            )
+
+            int_lat = math.asin(
+                math.sin(latitude) * math.cos(d_13)
+                + math.cos(latitude)
+                * math.sin(d_13)
+                * math.cos(math.radians(direction))
+            )
+            int_lon = longitude + math.atan2(
+                math.sin(math.radians(direction)) * math.sin(d_13) * math.cos(latitude),
+                math.cos(d_13) - math.sin(latitude) * math.sin(int_lat),
+            )
+
+            # time when the ship will reach the intersection point
+            d = geopy.distance.distance((ship_lat, ship_lon), (int_lat, int_lon)).m
+            return d / kn_to_m_s(speed)
 
     def run(self):
         for msg in UDPStream(self.host, self.port):
