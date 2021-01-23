@@ -1,10 +1,13 @@
 import csv
+import math
 import threading
 import time
 from pkg_resources import resource_filename
 
 import flag
 from pyais.stream import UDPStream
+
+from aistweet.units import m_to_lat, m_to_lon
 
 
 class ShipDatabase(object):
@@ -35,7 +38,7 @@ class ShipDatabase(object):
 
         self.message_callbacks = []
 
-        self.lock = threading.Lock()
+        self.lock = threading.RLock()
 
         listener = threading.Thread(target=self.run, args=())
         listener.daemon = True
@@ -113,6 +116,31 @@ class ShipDatabase(object):
                 )
             except TypeError:
                 return (0, 0)
+
+    def center_coords(self, mmsi):
+        with self.lock:
+            lat = self.ships[mmsi]["lat"]
+            lon = self.ships[mmsi]["lon"]
+
+            if lat is None or lon is None:
+                return None
+
+            # offset of ship center in meters relative to ship coordinate frame
+            length, width = self.dimensions(mmsi)
+            l_offset = (length / 2.0) - (self.ships[mmsi]["to_stern"] or 0)
+            w_offset = (width / 2.0) - (self.ships[mmsi]["to_port"] or 0)
+
+            # longitude and latitude offsets rotated by ship heading
+            # (heading is expressed in clockwise degrees from north)
+            theta = math.radians(-(self.ships[mmsi]["heading"] or 0) % 360)
+            lat_offset = m_to_lat(
+                w_offset * math.sin(theta) + l_offset * math.cos(theta)
+            )
+            lon_offset = m_to_lon(
+                w_offset * math.cos(theta) - l_offset * math.sin(theta), lat
+            )
+
+            return (lat + lat_offset, lon + lon_offset)
 
     def run(self):
         for msg in UDPStream(self.host, self.port):
