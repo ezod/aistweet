@@ -10,7 +10,7 @@ from pyais.stream import UDPStream
 from aistweet.units import m_to_lat, m_to_lon
 
 
-class ShipDatabase(object):
+class ShipTracker(object):
     STATIC_MSGS = [5, 24]
     POSITION_MSGS = [1, 2, 3, 18]
     STATIC_FIELDS = [
