@@ -27,7 +27,10 @@ class Tweeter(object):
         self.snap(image_path)
 
         # tweet the image with info
-        self.twitter.update_with_media(image_path, self.generate_text(mmsi))
+        lat, lon = self.tracker.center_coords()
+        self.twitter.update_with_media(
+            image_path, self.generate_text(mmsi), lat=lat, long=lon
+        )
 
         # clean up the image
         os.remove(image_path)
