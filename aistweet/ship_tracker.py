@@ -203,7 +203,7 @@ class ShipTracker(object):
 
             # time when the ship will reach the intersection point
             d = geopy.distance.distance((ship_lat, ship_lon), (int_lat, int_lon)).m
-            return d / kn_to_m_s(speed)
+            return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed)
 
     def run(self):
         for msg in UDPStream(self.host, self.port):
