@@ -203,34 +203,42 @@ class ShipTracker(object):
             ship_lat, ship_lon = self.center_coords(mmsi)
             ship_dir = self.ships[mmsi]["course"]
 
+            # convert to radians
+            self_lat_r = math.radians(self.lat)
+            self_lon_r = math.radians(self.lon)
+            self_dir_r = math.radians(direction)
+            ship_lat_r = math.radians(ship_lat)
+            ship_lon_r = math.radians(ship_lon)
+            ship_dir_r = math.radians(ship_dir)
+
             # compute intersection point (http://www.movable-type.co.uk/scripts/latlong.html)
             d_12 = 2.0 * math.asin(
                 math.sqrt(
-                    math.sin((self.lat - ship_lat) / 2.0) ** 2
-                    + math.cos(self.lat)
-                    * math.cos(ship_lat)
-                    * math.sin((self.lon - ship_lon) / 2.0) ** 2
+                    math.sin((self_lat_r - ship_lat_r) / 2.0) ** 2
+                    + math.cos(self_lat_r)
+                    * math.cos(ship_lat_r)
+                    * math.sin((self_lon_r - ship_lon_r) / 2.0) ** 2
                 )
             )
 
             t_a = math.acos(
-                (math.sin(ship_lat) - math.sin(self.lat) * math.cos(d_12))
-                / (math.sin(d_12) * math.cos(self.lat))
+                (math.sin(ship_lat_r) - math.sin(self_lat_r) * math.cos(d_12))
+                / (math.sin(d_12) * math.cos(self_lat_r))
             )
             t_b = math.acos(
-                (math.sin(self.lat) - math.sin(ship_lat) * math.cos(d_12))
-                / (math.sin(d_12) * math.cos(ship_lat))
+                (math.sin(self_lat_r) - math.sin(ship_lat_r) * math.cos(d_12))
+                / (math.sin(d_12) * math.cos(ship_lat_r))
             )
 
-            if math.sin(ship_lon - self.lon) > 0.0:
+            if math.sin(ship_lon_r - self_lon_r) > 0.0:
                 t_12 = t_a
                 t_21 = math.tau - t_b
             else:
                 t_12 = math.tau - t_a
                 t_21 = t_b
 
-            a_1 = math.radians(direction) - t_12
-            a_2 = t_21 - math.radians(ship_dir)
+            a_1 = self_dir_r - t_12
+            a_2 = t_21 - ship_dir_r
             a_3 = math.acos(
                 -math.cos(a_1) * math.cos(a_2)
                 + math.sin(a_1) * math.sin(a_2) * math.cos(d_12)
@@ -240,16 +248,19 @@ class ShipTracker(object):
                 math.cos(a_2) + math.cos(a_1) * math.cos(a_3),
             )
 
-            int_lat = math.asin(
-                math.sin(self.lat) * math.cos(d_13)
-                + math.cos(self.lat)
+            int_lat_r = math.asin(
+                math.sin(self_lat_r) * math.cos(d_13)
+                + math.cos(self_lat_r)
                 * math.sin(d_13)
-                * math.cos(math.radians(direction))
+                * math.cos(self_dir_r)
             )
-            int_lon = self.lon + math.atan2(
-                math.sin(math.radians(direction)) * math.sin(d_13) * math.cos(self.lat),
-                math.cos(d_13) - math.sin(self.lat) * math.sin(int_lat),
+            int_lon_r = self_lon_r + math.atan2(
+                math.sin(self_dir_r) * math.sin(d_13) * math.cos(self_lat_r),
+                math.cos(d_13) - math.sin(self_lat_r) * math.sin(int_lat_r),
             )
+
+            int_lat = math.degrees(int_lat_r)
+            int_lon = math.degrees(int_lon_r)
 
             # time when the ship will reach the intersection point
             d = distance((ship_lat, ship_lon), (int_lat, int_lon)).m
