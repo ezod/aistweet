@@ -250,9 +250,7 @@ class ShipTracker(object):
 
             int_lat_r = math.asin(
                 math.sin(self_lat_r) * math.cos(d_13)
-                + math.cos(self_lat_r)
-                * math.sin(d_13)
-                * math.cos(self_dir_r)
+                + math.cos(self_lat_r) * math.sin(d_13) * math.cos(self_dir_r)
             )
             int_lon_r = self_lon_r + math.atan2(
                 math.sin(self_dir_r) * math.sin(d_13) * math.cos(self_lat_r),
