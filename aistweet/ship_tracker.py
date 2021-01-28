@@ -5,29 +5,35 @@ import time
 from pkg_resources import resource_filename
 
 import flag
-import geopy
+import sqlite3
+from geopy.distance import distance
+from pyais.ais_types import AISType
 from pyais.stream import UDPStream
 
-from aistweet.units import m_to_lat, m_to_lon
+from aistweet.units import kn_to_m_s, m_to_lat, m_to_lon
 
 
 class ShipTracker(object):
-    STATIC_MSGS = [5, 24]
-    POSITION_MSGS = [1, 2, 3, 18]
+    STATIC_MSGS = [AISType.STATIC, AISType.STATIC_AND_VOYAGE]
+    POSITION_MSGS = [
+        AISType.POS_CLASS_A1,
+        AISType.POS_CLASS_A2,
+        AISType.POS_CLASS_A3,
+        AISType.POS_CLASS_B,
+    ]
+
     STATIC_FIELDS = [
         "shipname",
-        "imo",
         "shiptype",
-        "destination",
-        "draught",
         "to_bow",
         "to_stern",
         "to_port",
         "to_starboard",
     ]
+    VOYAGE_FIELDS = ["imo", "destination", "draught"]
     POSITION_FIELDS = ["lat", "lon", "status", "heading", "course", "speed"]
 
-    def __init__(self, host, port, latitude, longitude):
+    def __init__(self, host, port, latitude, longitude, db_file=None):
         self.host = host
         self.port = port
 
@@ -35,6 +41,18 @@ class ShipTracker(object):
         self.lon = longitude
 
         self.ships = {}
+
+        self.db_file = db_file
+        if self.db_file:
+            conn = sqlite3.connect(self.db_file)
+            c = conn.cursor()
+            c.execute(
+                "CREATE TABLE IF NOT EXISTS Ships(mmsi INTEGER PRIMARY KEY, "
+                "shipname TEXT, shiptype INTEGER, to_bow INTEGER, to_stern INTEGER, "
+                "to_port INTEGER, to_starboard INTEGER)"
+            )
+            conn.commit()
+            conn.close()
 
         self.countries = self.readcsv("mid")
         self.shiptypes = self.readcsv("shiptype")
@@ -67,20 +85,45 @@ class ShipTracker(object):
         mmsi = int(data["mmsi"])
 
         with self.lock:
+            # open database connection
+            if self.db_file:
+                conn = sqlite3.connect(self.db_file)
+                c = conn.cursor()
+
             # create a new ship entry if necessary
             if not mmsi in self.ships:
-                self.ships[mmsi] = {
-                    "ais_class": "B" if data["type"] in [18, 24] else "A"
-                }
-                for key in self.STATIC_FIELDS + self.POSITION_FIELDS:
+                self.ships[mmsi] = {}
+                for key in (
+                    self.STATIC_FIELDS + self.VOYAGE_FIELDS + self.POSITION_FIELDS
+                ):
                     self.ships[mmsi][key] = None
                 self.ships[mmsi]["last_update"] = None
+                # try to retrieve cached static data
+                if self.db_file:
+                    c.execute("SELECT * FROM Ships WHERE mmsi = ?", (mmsi,))
+                    row = c.fetchone()
+                    if row:
+                        for key in self.STATIC_FIELDS:
+                            row = row[1:]
+                            self.ships[mmsi][key] = row[0]
 
             # handle static messages
             if data["type"] in self.STATIC_MSGS:
                 for key in self.STATIC_FIELDS:
                     self.ships[mmsi][key] = data[key]
-                # TODO: eta?
+                if self.db_file:
+                    c.execute(
+                        "INSERT OR REPLACE INTO Ships VALUES(?"
+                        + ", ?" * len(self.STATIC_FIELDS)
+                        + ")",
+                        (mmsi,)
+                        + tuple([self.ships[mmsi][key] for key in self.STATIC_FIELDS]),
+                    )
+                    conn.commit()
+                if data["type"] == AISType.STATIC_AND_VOYAGE:
+                    for key in self.VOYAGE_FIELDS:
+                        self.ships[mmsi][key] = data[key]
+                        # TODO: eta?
 
             # handle position reports
             if data["type"] in self.POSITION_MSGS:
@@ -88,6 +131,7 @@ class ShipTracker(object):
                     self.ships[mmsi][key] = data[key]
                 self.ships[mmsi]["last_update"] = t
 
+        conn.close()
         return mmsi
 
     def __getitem__(self, mmsi):
@@ -153,7 +197,7 @@ class ShipTracker(object):
         with self.lock:
             # check for speed above a nominal threhsold
             speed = self.ships[mmsi]["speed"]
-            if speed < 0.2:
+            if speed is None or speed < 0.2:
                 return None
 
             ship_lat, ship_lon = self.center_coords(mmsi)
@@ -208,7 +252,7 @@ class ShipTracker(object):
             )
 
             # time when the ship will reach the intersection point
-            d = geopy.distance.distance((ship_lat, ship_lon), (int_lat, int_lon)).m
+            d = distance((ship_lat, ship_lon), (int_lat, int_lon)).m
             return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed)
 
     def run(self):
