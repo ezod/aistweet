@@ -1,8 +1,8 @@
 20,wing in Ground
-21,Wing in Ground (HAZ A)
-22,Wing in Ground (HAZ B)
-23,Wing in Ground (HAZ C)
-24,Wing in Ground (HAZ D)
+21,Wing in Ground (HAZ-A)
+22,Wing in Ground (HAZ-B)
+23,Wing in Ground (HAZ-C)
+24,Wing in Ground (HAZ-D)
 25,Wing in Ground
 26,Wing in Ground
 27,Wing in Ground
@@ -17,10 +17,10 @@
 36,Sailing
 37,Pleasure Craft
 40,High Speed Craft
-41,High Speed Craft (HAZ A)
-42,High Speed Craft (HAZ B)
-43,High Speed Craft (HAZ C)
-44,High Speed Craft (HAZ D)
+41,High Speed Craft (HAZ-A)
+42,High Speed Craft (HAZ-B)
+43,High Speed Craft (HAZ-C)
+44,High Speed Craft (HAZ-D)
 45,High Speed Craft
 46,High Speed Craft
 47,High Speed Craft
@@ -37,40 +37,40 @@
 58,Medical Transport
 59,Noncombatant Ship
 60,Passenger
-61,Passenger (HAZ A)
-62,Passenger (HAZ B)
-63,Passenger (HAZ C)
-64,Passenger (HAZ D)
+61,Passenger (HAZ-A)
+62,Passenger (HAZ-B)
+63,Passenger (HAZ-C)
+64,Passenger (HAZ-D)
 65,Passenger
 66,Passenger
 67,Passenger
 68,Passenger
 69,Passenger
 70,Cargo
-71,Cargo (HAZ A)
-72,Cargo (HAZ B)
-73,Cargo (HAZ C)
-74,Cargo (HAZ D)
+71,Cargo (HAZ-A)
+72,Cargo (HAZ-B)
+73,Cargo (HAZ-C)
+74,Cargo (HAZ-D)
 75,Cargo
 76,Cargo
 77,Cargo
 78,Cargo
 79,Cargo
 80,Tanker
-81,Tanker (HAZ A)
-82,Tanker (HAZ B)
-83,Tanker (HAZ C)
-84,Tanker (HAZ D)
+81,Tanker (HAZ-A)
+82,Tanker (HAZ-B)
+83,Tanker (HAZ-C)
+84,Tanker (HAZ-D)
 85,Tanker
 86,Tanker
 87,Tanker
 88,Tanker
 89,Tanker
 90,Other
-91,Other (HAZ A)
-92,Other (HAZ B)
-93,Other (HAZ C)
-94,Other (HAZ D)
+91,Other (HAZ-A)
+92,Other (HAZ-B)
+93,Other (HAZ-C)
+94,Other (HAZ-D)
 95,Other
 96,Other
 97,Other
