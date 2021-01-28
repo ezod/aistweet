@@ -27,9 +27,12 @@ class ShipTracker(object):
     ]
     POSITION_FIELDS = ["lat", "lon", "status", "heading", "course", "speed"]
 
-    def __init__(self, host, port):
+    def __init__(self, host, port, latitude, longitude):
         self.host = host
         self.port = port
+
+        self.lat = latitude
+        self.lon = longitude
 
         self.ships = {}
 
@@ -55,6 +58,10 @@ class ShipTracker(object):
                 d[int(row[0])] = row[1]
         return d
 
+    @property
+    def coordinates(self):
+        return (self.lat, self.lon)
+
     def add_message(self, data, t):
         # get the MMSI
         mmsi = int(data["mmsi"])
@@ -67,9 +74,7 @@ class ShipTracker(object):
                 }
                 for key in self.STATIC_FIELDS + self.POSITION_FIELDS:
                     self.ships[mmsi][key] = None
-
-            # bump latest update time
-            self.ships[mmsi]["last_update"] = t
+                self.ships[mmsi]["last_update"] = None
 
             # handle static messages
             if data["type"] in self.STATIC_MSGS:
@@ -81,6 +86,7 @@ class ShipTracker(object):
             if data["type"] in self.POSITION_MSGS:
                 for key in self.POSITION_FIELDS:
                     self.ships[mmsi][key] = data[key]
+                self.ships[mmsi]["last_update"] = t
 
         return mmsi
 
@@ -143,36 +149,36 @@ class ShipTracker(object):
 
             return (lat + lat_offset, lon + lon_offset)
 
-    def crossing_time(self, latitude, longitude, direction):
+    def crossing_time(self, mmsi, direction):
         with self.lock:
             # check for speed above a nominal threhsold
             speed = self.ships[mmsi]["speed"]
             if speed < 0.2:
                 return None
 
-            ship_lat, ship_lon = center_coords(mmsi)
+            ship_lat, ship_lon = self.center_coords(mmsi)
             ship_dir = self.ships[mmsi]["course"]
 
             # compute intersection point (http://www.movable-type.co.uk/scripts/latlong.html)
             d_12 = 2.0 * math.asin(
                 math.sqrt(
-                    math.sin((latitude - ship_lat) / 2.0) ** 2
-                    + math.cos(latitude)
+                    math.sin((self.lat - ship_lat) / 2.0) ** 2
+                    + math.cos(self.lat)
                     * math.cos(ship_lat)
-                    * math.sin((longitude - ship_lon) / 2.0) ** 2
+                    * math.sin((self.lon - ship_lon) / 2.0) ** 2
                 )
             )
 
             t_a = math.acos(
-                (math.sin(ship_lat) - math.sin(latitude) * math.cos(d_12))
-                / (math.sin(d_12) * math.cos(latitude))
+                (math.sin(ship_lat) - math.sin(self.lat) * math.cos(d_12))
+                / (math.sin(d_12) * math.cos(self.lat))
             )
             t_b = math.acos(
-                (math.sin(latitude) - math.sin(ship_lat) * math.cos(d_12))
+                (math.sin(self.lat) - math.sin(ship_lat) * math.cos(d_12))
                 / (math.sin(d_12) * math.cos(ship_lat))
             )
 
-            if math.sin(ship_lon - longitude) > 0.0:
+            if math.sin(ship_lon - self.lon) > 0.0:
                 t_12 = t_a
                 t_21 = math.tau - t_b
             else:
@@ -191,14 +197,14 @@ class ShipTracker(object):
             )
 
             int_lat = math.asin(
-                math.sin(latitude) * math.cos(d_13)
-                + math.cos(latitude)
+                math.sin(self.lat) * math.cos(d_13)
+                + math.cos(self.lat)
                 * math.sin(d_13)
                 * math.cos(math.radians(direction))
             )
-            int_lon = longitude + math.atan2(
-                math.sin(math.radians(direction)) * math.sin(d_13) * math.cos(latitude),
-                math.cos(d_13) - math.sin(latitude) * math.sin(int_lat),
+            int_lon = self.lon + math.atan2(
+                math.sin(math.radians(direction)) * math.sin(d_13) * math.cos(self.lat),
+                math.cos(d_13) - math.sin(self.lat) * math.sin(int_lat),
             )
 
             # time when the ship will reach the intersection point
