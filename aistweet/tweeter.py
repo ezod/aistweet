@@ -30,6 +30,8 @@ class Tweeter(object):
 
         # set up camera
         self.camera = PiCamera()
+        self.camera.resolution = (3280, 2464)
+        self.camera.zoom = (0.25, 0.35, 0.5, 0.5)
 
         # set up Twitter connection
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
