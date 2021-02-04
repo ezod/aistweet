@@ -128,7 +128,10 @@ class ShipTracker(object):
             # handle position reports
             if data["type"] in self.POSITION_MSGS:
                 for key in self.POSITION_FIELDS:
-                    self.ships[mmsi][key] = data[key]
+                    try:
+                        self.ships[mmsi][key] = data[key]
+                    except KeyError:
+                        pass
                 self.ships[mmsi]["last_update"] = t
 
         conn.close()
