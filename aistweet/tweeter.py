@@ -48,10 +48,12 @@ class Tweeter(object):
         delta = crossing - time.time()
         if not mmsi in self.schedule and delta < self.CAMERA_WARMUP + 0.5:
             snap_and_tweet(self, mmsi)
-        if self.CAMERA_WARMUP + 0.5 < delta < 10.0:
-            existing_event = self.schedule.pop(mmsi)
-            if existing_event:
+        if self.CAMERA_WARMUP + 0.5 < delta < 60.0:
+            try:
+                existing_event = self.schedule.pop(mmsi)
                 self.scheduler.cancel(existing_event)
+            except KeyError:
+                pass
             self.schedule[mmsi] = self.scheduler.enterabs(
                 crossing - self.CAMERA_WARMUP - time.time() + time.monotonic(),
                 1,
@@ -66,7 +68,7 @@ class Tweeter(object):
             self.snap(image_path)
 
             # tweet the image with info
-            lat, lon = self.tracker.center_coords()
+            lat, lon = self.tracker.center_coords(mmsi)
             self.twitter.update_with_media(
                 image_path, self.generate_text(mmsi), lat=lat, long=lon
             )
