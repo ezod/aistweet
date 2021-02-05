@@ -63,7 +63,6 @@ class ShipTracker(object):
         self.lock = threading.RLock()
 
         listener = threading.Thread(target=self.run, args=())
-        listener.daemon = True
         listener.start()
 
     @staticmethod
