@@ -18,10 +18,13 @@ class Tweeter(object):
         consumer_secret,
         access_token,
         access_token_secret,
+        hashtags=[]
     ):
         self.tracker = tracker
 
         self.direction = direction
+
+        self.hashtags = hashtags
 
         self.schedule = {}
         self.scheduler = EventScheduler("tweeter")
@@ -116,5 +119,8 @@ class Tweeter(object):
             text += u", course: {c:.1f} \N{DEGREE SIGN} / speed: {s} kn".format(
                 c=course, s=speed
             )
+
+        for hashtag in self.hashtags:
+            text += u" #{}".format(hashtag)
 
         return text

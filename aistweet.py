@@ -34,6 +34,7 @@ if __name__ == "__main__":
         "--port", type=int, default=10110, help=("port for receiving UDP AIS messages")
     )
     parser.add_argument("--db", type=str, help=("database file for static ship data"))
+    parser.add_argument("--hashtags", type=str, nargs="+", default=[], help=("hashtags to add to tweets"))
     args = parser.parse_args()
 
     tracker = ShipTracker(args.host, args.port, args.latitude, args.longitude, args.db)
@@ -44,4 +45,5 @@ if __name__ == "__main__":
         args.consumer_secret,
         args.access_token,
         args.access_token_secret,
+        args.hashtags
     )
