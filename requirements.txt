@@ -1,0 +1,8 @@
+astral
+flag
+geopy
+picamera
+pyais
+pytz
+timezonefinder
+tweepy
