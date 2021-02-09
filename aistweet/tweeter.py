@@ -19,7 +19,7 @@ class Tweeter(object):
         consumer_secret,
         access_token,
         access_token_secret,
-        hashtags=[]
+        hashtags=[],
     ):
         self.tracker = tracker
 
@@ -52,7 +52,10 @@ class Tweeter(object):
         if crossing is None:
             return
         delta = crossing - time.time()
-        if not mmsi in self.schedule and delta < self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5:
+        if (
+            not mmsi in self.schedule
+            and delta < self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5
+        ):
             snap_and_tweet(self, mmsi)
         if self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5 < delta < 60.0:
             try:
@@ -61,7 +64,11 @@ class Tweeter(object):
             except KeyError:
                 pass
             self.schedule[mmsi] = self.scheduler.enterabs(
-                crossing - self.CAMERA_WARMUP - self.CAMERA_DELAY - time.time() + time.monotonic(),
+                crossing
+                - self.CAMERA_WARMUP
+                - self.CAMERA_DELAY
+                - time.time()
+                + time.monotonic(),
                 1,
                 self.snap_and_tweet,
                 argument=(mmsi,),
