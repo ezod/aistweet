@@ -9,6 +9,7 @@ from picamera import PiCamera
 
 class Tweeter(object):
     CAMERA_WARMUP = 1.0
+    CAMERA_DELAY = 1.0
 
     def __init__(
         self,
@@ -51,16 +52,16 @@ class Tweeter(object):
         if crossing is None:
             return
         delta = crossing - time.time()
-        if not mmsi in self.schedule and delta < self.CAMERA_WARMUP + 0.5:
+        if not mmsi in self.schedule and delta < self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5:
             snap_and_tweet(self, mmsi)
-        if self.CAMERA_WARMUP + 0.5 < delta < 60.0:
+        if self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5 < delta < 60.0:
             try:
                 existing_event = self.schedule.pop(mmsi)
                 self.scheduler.cancel(existing_event)
             except KeyError:
                 pass
             self.schedule[mmsi] = self.scheduler.enterabs(
-                crossing - self.CAMERA_WARMUP - time.time() + time.monotonic(),
+                crossing - self.CAMERA_WARMUP - self.CAMERA_DELAY - time.time() + time.monotonic(),
                 1,
                 self.snap_and_tweet,
                 argument=(mmsi,),
