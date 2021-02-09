@@ -1,3 +1,4 @@
+import datetime
 import os
 import threading
 import time
@@ -5,6 +6,11 @@ import time
 import tweepy
 from event_scheduler import EventScheduler
 from picamera import PiCamera
+
+import astral
+import astral.sun
+import pytz
+from timezonefinder import TimezoneFinder
 
 
 class Tweeter(object):
@@ -31,6 +37,16 @@ class Tweeter(object):
         self.scheduler = EventScheduler("tweeter")
 
         self.lock = threading.RLock()
+
+        # set up location data
+        tf = TimezoneFinder()
+        self.location = astral.LocationInfo(
+            "AIS Station",
+            "Earth",
+            tf.timezone_at(lat=self.tracker.lat, lng=self.tracker.lon),
+            self.tracker.lat,
+            self.tracker.lon,
+        )
 
         # set up camera
         self.camera = PiCamera()
@@ -94,10 +110,28 @@ class Tweeter(object):
 
     def snap(self, path):
         with self.lock:
-            # TODO: get sunrise/sunset (astral?) and adjust exposure
+            # set exposure mode based on dawn/dusk times
+            sun = astral.sun.sun(
+                self.location.observer,
+                datetime.date.today(),
+                tzinfo=self.location.timezone,
+            )
+            now = self.now()
+            if now < sun["dawn"] or now > sun["dusk"]:
+                self.camera.exposure_mode = "night"
+            else:
+                self.camera.exposure_mode = "auto"
+
+            # capture image
             self.camera.start_preview()
             time.sleep(self.CAMERA_WARMUP)
             self.camera.capture(path)
+            self.camera.stop_preview()
+
+    def now(self):
+        now = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(
+            pytz.timezone(self.location.timezone)
+        )
 
     def generate_text(self, mmsi):
         text = u"{} ".format(self.tracker.flag(mmsi))
