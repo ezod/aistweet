@@ -62,8 +62,9 @@ class ShipTracker(object):
 
         self.lock = threading.RLock()
 
-        listener = threading.Thread(target=self.run, args=())
-        listener.start()
+        self.listener = threading.Thread(target=self.run, args=())
+        self.listener.daemon = True
+        self.listener.start()
 
     @staticmethod
     def readcsv(filename):

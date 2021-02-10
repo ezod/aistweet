@@ -63,6 +63,9 @@ class Tweeter(object):
         # register callback
         self.tracker.message_callbacks.append(self.check)
 
+    def stop(self):
+        self.scheduler.stop()
+
     def check(self, mmsi, t):
         crossing = self.tracker.crossing_time(mmsi, self.direction)
         if crossing is None:

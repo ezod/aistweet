@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import argparse
+import threading
 import time
 
 from aistweet.ship_tracker import ShipTracker
@@ -34,16 +35,31 @@ if __name__ == "__main__":
         "--port", type=int, default=10110, help=("port for receiving UDP AIS messages")
     )
     parser.add_argument("--db", type=str, help=("database file for static ship data"))
-    parser.add_argument("--hashtags", type=str, nargs="+", default=[], help=("hashtags to add to tweets"))
+    parser.add_argument(
+        "--hashtags",
+        type=str,
+        nargs="+",
+        default=[],
+        help=("hashtags to add to tweets"),
+    )
     args = parser.parse_args()
 
-    tracker = ShipTracker(args.host, args.port, args.latitude, args.longitude, args.db)
-    tweeter = Tweeter(
-        tracker,
-        args.direction,
-        args.consumer_key,
-        args.consumer_secret,
-        args.access_token,
-        args.access_token_secret,
-        args.hashtags
-    )
+    try:
+        tracker = ShipTracker(
+            args.host, args.port, args.latitude, args.longitude, args.db
+        )
+        tweeter = Tweeter(
+            tracker,
+            args.direction,
+            args.consumer_key,
+            args.consumer_secret,
+            args.access_token,
+            args.access_token_secret,
+            args.hashtags,
+        )
+        forever = threading.Event()
+        forever.wait()
+    except KeyboardInterrupt:
+        pass
+    finally:
+        tweeter.stop()
