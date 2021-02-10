@@ -129,7 +129,7 @@ class Tweeter(object):
             self.camera.stop_preview()
 
     def now(self):
-        now = pytz.utc.localize(datetime.datetime.utcnow()).astimezone(
+        return pytz.utc.localize(datetime.datetime.utcnow()).astimezone(
             pytz.timezone(self.location.timezone)
         )
 
