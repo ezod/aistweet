@@ -1,4 +1,5 @@
 astral
+event-scheduler
 flag
 geopy
 picamera
