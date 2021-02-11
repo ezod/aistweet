@@ -1,78 +1,78 @@
-20,Wing in Ground,W
-21,Wing in Ground (HAZ-A),W
-22,Wing in Ground (HAZ-B),W
-23,Wing in Ground (HAZ-C),W
-24,Wing in Ground (HAZ-D),W
-25,Wing in Ground,W
-26,Wing in Ground,W
-27,Wing in Ground,W
-28,Wing in Ground,W
-29,Wing in Ground,W
-30,Fishing,N
-31,Towing,U
-32,Towing,U
-33,Dredging or Underwater Ops,R
-34,Diving Ops,R
-35,Military Ops,R
-36,Sailing,P
-37,Pleasure Craft,P
-40,High Speed Craft,B
-41,High Speed Craft (HAZ-A),B
-42,High Speed Craft (HAZ-B),B
-43,High Speed Craft (HAZ-C),B
-44,High Speed Craft (HAZ-D),B
-45,High Speed Craft,B
-46,High Speed Craft,B
-47,High Speed Craft,B
-48,High Speed Craft,B
-49,High Speed Craft,B
-50,Pilot Vessel,U
-51,Search and Rescue,R
-52,Tug,U
-53,Port Tender,U
-54,Anti-Pollution Equipment,R
-55,Law Enforcement,R
-56,Local Vessel,U
-57,Local Vessel,U
-58,Medical Transport,R
-59,Noncombatant Ship,R
-60,Passenger,G
-61,Passenger (HAZ-A),G
-62,Passenger (HAZ-B),G
-63,Passenger (HAZ-C),G
-64,Passenger (HAZ-D),G
-65,Passenger,G
-66,Passenger,G
-67,Passenger,G
-68,Passenger,G
-69,Passenger,G
-70,Cargo,Y
-71,Cargo (HAZ-A),Y
-72,Cargo (HAZ-B),Y
-73,Cargo (HAZ-C),Y
-74,Cargo (HAZ-D),Y
-75,Cargo,Y
-76,Cargo,Y
-77,Cargo,Y
-78,Cargo,Y
-79,Cargo,Y
-80,Tanker,O
-81,Tanker (HAZ-A),O
-82,Tanker (HAZ-B),O
-83,Tanker (HAZ-C),O
-84,Tanker (HAZ-D),O
-85,Tanker,O
-86,Tanker,O
-87,Tanker,O
-88,Tanker,O
-89,Tanker,O
-90,Other,U
-91,Other (HAZ-A),U
-92,Other (HAZ-B),U
-93,Other (HAZ-C),U
-94,Other (HAZ-D),U
-95,Other,U
-96,Other,U
-97,Other,U
-98,Other,U
-99,Other,U
+20,wing in Ground
+21,Wing in Ground (HAZ-A)
+22,Wing in Ground (HAZ-B)
+23,Wing in Ground (HAZ-C)
+24,Wing in Ground (HAZ-D)
+25,Wing in Ground
+26,Wing in Ground
+27,Wing in Ground
+28,Wing in Ground
+29,Wing in Ground
+30,Fishing
+31,Towing
+32,Towing
+33,Dredging or Underwater Ops
+34,Diving Ops
+35,Military Ops
+36,Sailing
+37,Pleasure Craft
+40,High Speed Craft
+41,High Speed Craft (HAZ-A)
+42,High Speed Craft (HAZ-B)
+43,High Speed Craft (HAZ-C)
+44,High Speed Craft (HAZ-D)
+45,High Speed Craft
+46,High Speed Craft
+47,High Speed Craft
+48,High Speed Craft
+49,High Speed Craft
+50,Pilot Vessel
+51,Search and Rescue
+52,Tug
+53,Port Tender
+54,Anti-Pollution Equipment
+55,Law Enforcement
+56,Local Vessel
+57,Local Vessel
+58,Medical Transport
+59,Noncombatant Ship
+60,Passenger
+61,Passenger (HAZ-A)
+62,Passenger (HAZ-B)
+63,Passenger (HAZ-C)
+64,Passenger (HAZ-D)
+65,Passenger
+66,Passenger
+67,Passenger
+68,Passenger
+69,Passenger
+70,Cargo
+71,Cargo (HAZ-A)
+72,Cargo (HAZ-B)
+73,Cargo (HAZ-C)
+74,Cargo (HAZ-D)
+75,Cargo
+76,Cargo
+77,Cargo
+78,Cargo
+79,Cargo
+80,Tanker
+81,Tanker (HAZ-A)
+82,Tanker (HAZ-B)
+83,Tanker (HAZ-C)
+84,Tanker (HAZ-D)
+85,Tanker
+86,Tanker
+87,Tanker
+88,Tanker
+89,Tanker
+90,Other
+91,Other (HAZ-A)
+92,Other (HAZ-B)
+93,Other (HAZ-C)
+94,Other (HAZ-D)
+95,Other
+96,Other
+97,Other
+98,Other
+99,Other

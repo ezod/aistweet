@@ -33,18 +33,6 @@ class ShipTracker(object):
     VOYAGE_FIELDS = ["imo", "destination", "draught"]
     POSITION_FIELDS = ["lat", "lon", "status", "heading", "course", "speed"]
 
-    COLORS = {
-        "B": "\U000026AB",
-        "G": "\U0001F7E2",
-        "N": "\U0001F7E4",
-        "O": "\U0001F7E0",
-        "P": "\U0001F7E3",
-        "R": "\U0001F534",
-        "U": "\U0001F535",
-        "W": "\U000026AA",
-        "Y": "\U0001F7E1",
-    }
-
     def __init__(self, host, port, latitude, longitude, db_file=None):
         self.host = host
         self.port = port
@@ -68,7 +56,6 @@ class ShipTracker(object):
 
         self.countries = self.readcsv("mid")
         self.shiptypes = self.readcsv("shiptype")
-        self.shipcolors = self.readcsv("shiptype", 2)
         self.statuses = self.readcsv("status")
 
         self.message_callbacks = []
@@ -80,13 +67,13 @@ class ShipTracker(object):
         self.listener.start()
 
     @staticmethod
-    def readcsv(filename, index=1):
+    def readcsv(filename):
         d = {}
         path = resource_filename("aistweet", "data/{}.csv".format(filename))
         with open(path, newline="") as f:
             reader = csv.reader(f)
             for row in reader:
-                d[int(row[0])] = row[index]
+                d[int(row[0])] = row[1]
         return d
 
     @property
@@ -163,10 +150,7 @@ class ShipTracker(object):
     def ship_type(self, mmsi):
         with self.lock:
             try:
-                return "{color} {shiptype}".format(
-                    color=self.COLORS[self.shipcolors[self.ships[mmsi]["shiptype"]]],
-                    shiptype=self.shiptypes[self.ships[mmsi]["shiptype"]],
-                )
+                return self.shiptypes[self.ships[mmsi]["shiptype"]]
             except KeyError:
                 return "Unknown Type"
 
