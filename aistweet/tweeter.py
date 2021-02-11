@@ -70,28 +70,24 @@ class Tweeter(object):
         crossing = self.tracker.crossing_time(mmsi, self.direction)
         if crossing is None:
             return
-        delta = crossing - time.time()
-        if (
-            not mmsi in self.schedule
-            and delta < self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5
-        ):
+        delta = crossing - time.time() - self.CAMERA_WARMUP - self.CAMERA_DELAY
+        if not mmsi in self.schedule and delta < 0.5:
             snap_and_tweet(self, mmsi)
-        if self.CAMERA_WARMUP + self.CAMERA_DELAY + 0.5 < delta < 60.0:
+        elif 0.5 < delta < 60.0:
             try:
                 existing_event = self.schedule.pop(mmsi)
                 self.scheduler.cancel(existing_event)
-            except KeyError:
+            except (KeyError, ValueError):
                 pass
-            self.schedule[mmsi] = self.scheduler.enterabs(
-                crossing
-                - self.CAMERA_WARMUP
-                - self.CAMERA_DELAY
-                - time.time()
-                + time.monotonic(),
+            self.schedule[mmsi] = self.scheduler.enter(
+                delta,
                 1,
                 self.snap_and_tweet,
                 argument=(mmsi,),
             )
+
+    def purge_schedule(self, mmsi):
+        del self.schedule[mmsi]
 
     def snap_and_tweet(self, mmsi):
         with self.lock:
@@ -110,6 +106,9 @@ class Tweeter(object):
 
             # clean up the image
             os.remove(image_path)
+
+            # remove event from schedule after a minute
+            self.scheduler.enter(60.0, 2, self.purge_schedule, argument=(mmsi,))
 
     def snap(self, path):
         with self.lock:
