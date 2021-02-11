@@ -2,7 +2,6 @@
 
 import argparse
 import threading
-import time
 
 from aistweet.ship_tracker import ShipTracker
 from aistweet.tweeter import Tweeter
