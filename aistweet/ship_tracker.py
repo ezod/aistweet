@@ -264,7 +264,10 @@ class ShipTracker(object):
             int_lon = math.degrees(int_lon_r)
 
             # time when the ship will reach the intersection point
-            d = distance((ship_lat, ship_lon), (int_lat, int_lon)).m
+            try:
+                d = distance((ship_lat, ship_lon), (int_lat, int_lon)).m
+            except ValueError:
+                return None
             return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed)
 
     def run(self):
