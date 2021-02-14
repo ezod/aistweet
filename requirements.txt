@@ -1,6 +1,6 @@
 astral
+emoji-country-flag
 event-scheduler
-flag
 geopy
 picamera
 pyais
