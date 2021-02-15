@@ -1,7 +1,29 @@
 `aistweet`, a Twitter photo bot for Raspberry Pi AIS tracking stations
 ----------------------------------------------------------------------
 
-aistweet tracks ships via AIS and takes their picture with a Raspberry Pi camera as they pass by.
+aistweet tracks ships via AIS and takes their picture with a Raspberry Pi
+camera as they pass by.
+
+How To Build It
+---------------
+
+Things you will need:
+
+  - a [Raspberry Pi]
+  - a [Raspberry Pi Camera Module]
+  - a USB SDR dongle, such as [Nooelec NESDR Smart v4]
+  - a VHF antenna suitable for receiving [AIS] transmissions
+
+Build and install [rtl-ais], and configure it to stream UDP data to the host
+and port defined by the aistweet command line.
+
+If you want to also upload your AIS data to other services online and have a
+locally-hosted interactive map, you can use [rPiAIS], but note that the image
+will need to be upgraded to the Buster release.
+
+It is important to set the latitude, longitude, and direction of your camera
+accurately in order for the snapshot timing to work. The direction is measured
+in degrees clockwise from north of the camera's center axis.
 
 Command Line
 ------------
@@ -42,3 +64,11 @@ Dependencies
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
   - [tweepy](https://pypi.org/project/tweepy/)
+
+
+[AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
+[Nooelec NESDR Smart v4]: https://www.nooelec.com/store/sdr/sdr-receivers/nesdr-smart-sdr.html
+[Raspberry Pi]: https://www.raspberrypi.org/
+[Raspberry Pi Camera Module]: https://www.raspberrypi.org/products/camera-module-v2/
+[rPiAIS]: https://www.aishub.net/rpiais
+[rtl-ais]: https://github.com/dgiardini/rtl-ais
