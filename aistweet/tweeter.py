@@ -26,12 +26,15 @@ class Tweeter(object):
         access_token,
         access_token_secret,
         hashtags=[],
+        logging=True,
     ):
         self.tracker = tracker
 
         self.direction = direction
 
         self.hashtags = hashtags
+
+        self.logging = logging
 
         self.schedule = {}
         self.scheduler = EventScheduler("tweeter")
@@ -66,6 +69,11 @@ class Tweeter(object):
     def stop(self):
         self.scheduler.stop()
 
+    def log(self, mmsi, message):
+        if self.logging:
+            shipname = self.tracker[mmsi]["shipname"]
+            print("[{}] {}: {}".format(str(datetime.datetime.now()), shipname, message))
+
     def check(self, mmsi, t):
         crossing = self.tracker.crossing_time(mmsi, self.direction)
         if crossing is None:
@@ -85,15 +93,19 @@ class Tweeter(object):
                 self.snap_and_tweet,
                 argument=(mmsi,),
             )
+            self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
 
     def purge_schedule(self, mmsi):
         del self.schedule[mmsi]
+        self.log(mmsi, "removed from schedule")
 
     def snap_and_tweet(self, mmsi):
+        self.log(mmsi, "ship in view, tweeting...")
         with self.lock:
             # grab the image
             image_path = os.path.join("/tmp", "{}.jpg".format(mmsi))
             self.snap(image_path)
+            self.log(mmsi, "image captured to {}".format(image_path))
 
             # tweet the image with info
             lat, lon = self.tracker.center_coords(mmsi)
@@ -101,14 +113,16 @@ class Tweeter(object):
                 self.twitter.update_with_media(
                     image_path, self.generate_text(mmsi), lat=lat, long=lon
                 )
-            except tweepy.error.TweepError:
-                pass
+            except tweepy.error.TweepError as e:
+                self.log(mmsi, "tweet error: {}".format(e))
 
             # clean up the image
             os.remove(image_path)
 
             # remove event from schedule after a minute
             self.scheduler.enter(60.0, 2, self.purge_schedule, argument=(mmsi,))
+
+        self.log(mmsi, "done tweeting")
 
     def snap(self, path):
         with self.lock:
