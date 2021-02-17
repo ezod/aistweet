@@ -204,6 +204,9 @@ class ShipTracker(object):
                 return None
 
             ship_lat, ship_lon = self.center_coords(mmsi)
+            if not (-90.0 < ship_lat < 90.0 and -180.0 < ship_lon < 180.0):
+                return None
+
             ship_dir = self.ships[mmsi]["course"]
 
             # convert to radians
