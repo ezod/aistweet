@@ -1,4 +1,5 @@
 import datetime
+import fractions
 import os
 import threading
 import time
@@ -53,7 +54,6 @@ class Tweeter(object):
 
         # set up camera
         self.camera = PiCamera()
-        self.camera.resolution = (3280, 2464)
         self.camera.zoom = (0.25, 0.35, 0.5, 0.5)
 
         # set up Twitter connection
@@ -134,8 +134,12 @@ class Tweeter(object):
             )
             now = self.now()
             if now < sun["dawn"] or now > sun["dusk"]:
+                self.camera.resolution = (1640, 1232)
+                self.camera.framerate = fractions.Fraction(2, 1)
                 self.camera.exposure_mode = "night"
             else:
+                self.camera.resolution = (3280, 2464)
+                self.camera.framerate = fractions.Fraction(30, 1)
                 self.camera.exposure_mode = "auto"
 
             # capture image
