@@ -276,7 +276,10 @@ class ShipTracker(object):
     def run(self):
         for msg in UDPStream(self.host, self.port):
             data = msg.decode()
-            if data["type"] in self.STATIC_MSGS + self.POSITION_MSGS:
+            if (
+                data["type"] is not None
+                and data["type"] in self.STATIC_MSGS + self.POSITION_MSGS
+            ):
                 t = time.time()
                 mmsi = self.add_message(data, t)
                 for callback in self.message_callbacks:
