@@ -281,6 +281,9 @@ class ShipTracker(object):
                 and data["type"] in self.STATIC_MSGS + self.POSITION_MSGS
             ):
                 t = time.time()
-                mmsi = self.add_message(data, t)
-                for callback in self.message_callbacks:
-                    callback(mmsi, t)
+                try:
+                    mmsi = self.add_message(data, t)
+                    for callback in self.message_callbacks:
+                        callback(mmsi, t)
+                except:
+                    pass
