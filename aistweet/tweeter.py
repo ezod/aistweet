@@ -54,7 +54,6 @@ class Tweeter(object):
 
         # set up camera
         self.camera = PiCamera()
-        self.camera.zoom = (0.25, 0.35, 0.5, 0.5)
 
         # set up Twitter connection
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -104,7 +103,7 @@ class Tweeter(object):
         with self.lock:
             # grab the image
             image_path = os.path.join("/tmp", "{}.jpg".format(mmsi))
-            self.snap(image_path)
+            self.snap(image_path, self.tracker.dimensions(mmsi)[0] > 210)
             self.log(mmsi, "image captured to {}".format(image_path))
 
             # tweet the image with info
@@ -124,8 +123,10 @@ class Tweeter(object):
 
         self.log(mmsi, "done tweeting")
 
-    def snap(self, path):
+    def snap(self, path, large):
         with self.lock:
+            # set zoom based on ship size
+            self.camera.zoom = (0.0, 0.0, 1.0, 1.0) if large else (0.25, 0.35, 0.5, 0.5)
             # set exposure mode based on dawn/dusk times
             sun = astral.sun.sun(
                 self.location.observer,
@@ -138,7 +139,7 @@ class Tweeter(object):
                 self.camera.framerate = fractions.Fraction(2, 1)
                 self.camera.exposure_mode = "night"
             else:
-                self.camera.resolution = (3280, 2464)
+                self.camera.resolution = (1640, 1232) if large else (3280, 2464)
                 self.camera.framerate = fractions.Fraction(30, 1)
                 self.camera.exposure_mode = "auto"
 
