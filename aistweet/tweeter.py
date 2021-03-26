@@ -182,7 +182,7 @@ class Tweeter(object):
         course = ship["course"]
         speed = ship["speed"]
         if course is not None and speed is not None:
-            text += u", course: {c:.1f} \N{DEGREE SIGN} / speed: {s} kn".format(
+            text += u", course: {c:.1f} \N{DEGREE SIGN} / speed: {s:.1f} kn".format(
                 c=course, s=speed
             )
 
