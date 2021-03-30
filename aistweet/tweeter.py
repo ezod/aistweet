@@ -186,6 +186,10 @@ class Tweeter(object):
                 c=course, s=speed
             )
 
+        text += u" https://www.marinetraffic.com/en/ais/details/ships/mmsi:{}".format(
+            mmsi
+        )
+
         for hashtag in self.hashtags:
             text += u" #{}".format(hashtag)
 
