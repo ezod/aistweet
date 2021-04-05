@@ -277,7 +277,8 @@ class ShipTracker(object):
         for msg in UDPStream(self.host, self.port):
             data = msg.decode()
             if (
-                data["type"] is not None
+                data is not None
+                and data["type"] is not None
                 and data["type"] in self.STATIC_MSGS + self.POSITION_MSGS
             ):
                 t = time.time()
