@@ -79,7 +79,7 @@ class Tweeter(object):
             return
         delta = crossing - time.time() - self.CAMERA_WARMUP - self.CAMERA_DELAY
         if not mmsi in self.schedule and delta < 0.5:
-            self.snap_and_tweet(self, mmsi)
+            self.snap_and_tweet(mmsi)
         elif 0.5 < delta < 60.0:
             try:
                 existing_event = self.schedule.pop(mmsi)
