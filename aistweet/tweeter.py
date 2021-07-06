@@ -90,7 +90,7 @@ class Tweeter(object):
                 delta,
                 1,
                 self.snap_and_tweet,
-                argument=(mmsi,),
+                arguments=(mmsi,),
             )
             self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
 
@@ -122,7 +122,7 @@ class Tweeter(object):
             os.remove(image_path)
 
             # remove event from schedule after a minute
-            self.scheduler.enter(60.0, 2, self.purge_schedule, argument=(mmsi,))
+            self.scheduler.enter(60.0, 2, self.purge_schedule, arguments=(mmsi,))
 
         self.log(mmsi, "done tweeting")
 
