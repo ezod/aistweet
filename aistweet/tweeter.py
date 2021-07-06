@@ -95,8 +95,11 @@ class Tweeter(object):
             self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
 
     def purge_schedule(self, mmsi):
-        del self.schedule[mmsi]
-        self.log(mmsi, "removed from schedule")
+        try:
+            del self.schedule[mmsi]
+            self.log(mmsi, "removed from schedule")
+        except KeyError:
+            pass
 
     def snap_and_tweet(self, mmsi):
         self.log(mmsi, "ship in view, tweeting...")
