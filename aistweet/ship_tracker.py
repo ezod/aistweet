@@ -22,16 +22,23 @@ class ShipTracker(object):
         AISType.POS_CLASS_B,
     ]
 
-    STATIC_FIELDS = [
-        "shipname",
-        "shiptype",
-        "to_bow",
-        "to_stern",
-        "to_port",
-        "to_starboard",
-    ]
-    VOYAGE_FIELDS = ["imo", "destination", "draught"]
-    POSITION_FIELDS = ["lat", "lon", "status", "heading", "course", "speed"]
+    STATIC_FIELDS = {
+        "shipname": "(Unidentified)",
+        "shiptype": None,
+        "to_bow": 0,
+        "to_stern": 0,
+        "to_port": 0,
+        "to_starboard": 0,
+    }
+    VOYAGE_FIELDS = {"imo": None, "destination": None, "draught": 0.0}
+    POSITION_FIELDS = {
+        "lat": None,
+        "lon": None,
+        "status": None,
+        "heading": None,
+        "course": None,
+        "speed": None,
+    }
 
     def __init__(self, host, port, latitude, longitude, db_file=None):
         self.host = host
@@ -92,11 +99,11 @@ class ShipTracker(object):
 
             # create a new ship entry if necessary
             if not mmsi in self.ships:
-                self.ships[mmsi] = {}
-                for key in (
-                    self.STATIC_FIELDS + self.VOYAGE_FIELDS + self.POSITION_FIELDS
-                ):
-                    self.ships[mmsi][key] = None
+                self.ships[mmsi] = {
+                    **self.STATIC_FIELDS,
+                    **self.VOYAGE_FIELDS,
+                    **self.POSITION_FIELDS,
+                }
                 self.ships[mmsi]["last_update"] = None
                 # try to retrieve cached static data
                 if self.db_file:
@@ -110,7 +117,10 @@ class ShipTracker(object):
             # handle static messages
             if data["type"] in self.STATIC_MSGS:
                 for key in self.STATIC_FIELDS:
-                    self.ships[mmsi][key] = data[key]
+                    try:
+                        self.ships[mmsi][key] = data[key]
+                    except KeyError:
+                        pass
                 if self.db_file:
                     c.execute(
                         "INSERT OR REPLACE INTO Ships VALUES(?"
