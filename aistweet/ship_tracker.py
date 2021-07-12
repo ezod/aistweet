@@ -288,7 +288,7 @@ class ShipTracker(object):
             data = msg.decode()
             if (
                 data is not None
-                and data["type"] is not None
+                and "type" in data.content
                 and data["type"] in self.STATIC_MSGS + self.POSITION_MSGS
             ):
                 t = time.time()
