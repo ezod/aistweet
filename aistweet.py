@@ -41,6 +41,9 @@ if __name__ == "__main__":
         default=[],
         help=("hashtags to add to tweets"),
     )
+    parser.add_argument(
+        "--tts", action="store_true", help=("announce ship name via Festival TTS")
+    )
     args = parser.parse_args()
 
     try:
@@ -55,6 +58,7 @@ if __name__ == "__main__":
             args.access_token,
             args.access_token_secret,
             args.hashtags,
+            args.tts,
         )
         forever = threading.Event()
         forever.wait()

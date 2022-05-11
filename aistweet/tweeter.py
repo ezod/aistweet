@@ -27,6 +27,7 @@ class Tweeter(object):
         access_token,
         access_token_secret,
         hashtags=[],
+        tts=False,
         logging=True,
     ):
         self.tracker = tracker
@@ -34,6 +35,8 @@ class Tweeter(object):
         self.direction = direction
 
         self.hashtags = hashtags
+
+        self.tts = tts
 
         self.logging = logging
 
@@ -121,6 +124,12 @@ class Tweeter(object):
 
             # remove event from schedule after a minute
             self.scheduler.enter(60.0, 2, self.purge_schedule, arguments=(mmsi,))
+
+            # announce the ship using TTS
+            if self.tts:
+                shipname = self.tracker[mmsi]["shipname"]
+                if shipname:
+                    os.system("echo {} | festival --tts".format(shipname))
 
         self.log(mmsi, "done tweeting")
 
