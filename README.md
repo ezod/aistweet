@@ -51,6 +51,7 @@ optional arguments:
   --db DB               database file for static ship data
   --hashtags HASHTAGS [HASHTAGS ...]
                         hashtags to add to tweets
+  --tts                 announce ship name via Festival TTS
 ```
 
 Dependencies
