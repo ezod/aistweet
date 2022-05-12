@@ -8,7 +8,7 @@ import flag
 import sqlite3
 from geopy.distance import distance
 from pyais.ais_types import AISType
-from pyais.stream import UDPStream
+from pyais.stream import UDPReceiver
 
 from aistweet.units import kn_to_m_s, m_to_lat, m_to_lon
 
@@ -284,11 +284,11 @@ class ShipTracker(object):
             return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed)
 
     def run(self):
-        for msg in UDPStream(self.host, self.port):
+        for msg in UDPReceiver(self.host, self.port):
             data = msg.decode()
             if (
                 data is not None
-                and "type" in data.content
+                and "type" in data.asdict()
                 and data["type"] in self.STATIC_MSGS + self.POSITION_MSGS
             ):
                 t = time.time()
