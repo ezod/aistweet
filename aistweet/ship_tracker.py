@@ -115,7 +115,7 @@ class ShipTracker(object):
                             self.ships[mmsi][key] = row[0]
 
             # handle static messages
-            if data["type"] in self.STATIC_MSGS:
+            if data["msg_type"] in self.STATIC_MSGS:
                 for key in self.STATIC_FIELDS:
                     try:
                         self.ships[mmsi][key] = data[key]
@@ -130,13 +130,13 @@ class ShipTracker(object):
                         + tuple([self.ships[mmsi][key] for key in self.STATIC_FIELDS]),
                     )
                     conn.commit()
-                if data["type"] == AISType.STATIC_AND_VOYAGE:
+                if data["msg_type"] == AISType.STATIC_AND_VOYAGE:
                     for key in self.VOYAGE_FIELDS:
                         self.ships[mmsi][key] = data[key]
                         # TODO: eta?
 
             # handle position reports
-            if data["type"] in self.POSITION_MSGS:
+            if data["msg_type"] in self.POSITION_MSGS:
                 for key in self.POSITION_FIELDS:
                     try:
                         self.ships[mmsi][key] = data[key]
@@ -285,11 +285,11 @@ class ShipTracker(object):
 
     def run(self):
         for msg in UDPReceiver(self.host, self.port):
-            data = msg.decode()
+            data = msg.decode().asdict()
             if (
                 data is not None
-                and "type" in data.asdict()
-                and data["type"] in self.STATIC_MSGS + self.POSITION_MSGS
+                and "msg_type" in data
+                and data["msg_type"] in self.STATIC_MSGS + self.POSITION_MSGS
             ):
                 t = time.time()
                 mmsi = self.add_message(data, t)
