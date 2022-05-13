@@ -113,10 +113,10 @@ class Tweeter(object):
             # tweet the image with info
             lat, lon = self.tracker.center_coords(mmsi)
             try:
-                self.twitter.update_with_media(
-                    image_path, self.generate_text(mmsi), lat=lat, long=lon
+                self.twitter.update_status_with_media(
+                    self.generate_text(mmsi), image_path, lat=lat, long=lon
                 )
-            except tweepy.error.TweepError as e:
+            except tweepy.errors.TweepyException as e:
                 self.log(mmsi, "tweet error: {}".format(e))
 
             # clean up the image
