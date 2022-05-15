@@ -20,8 +20,7 @@ Build and install [rtl-ais], and configure it to stream UDP data to the host
 and port defined by the aistweet command line.
 
 If you want to also upload your AIS data to other services online and have a
-locally-hosted interactive map, you can use [rPiAIS], but note that the image
-will need to be upgraded to the Buster release.
+locally-hosted interactive map, you can use [AIS Dispatcher for Linux].
 
 It is important to set the latitude, longitude, and direction of your camera
 accurately in order for the snapshot timing to work. The direction is measured
@@ -69,11 +68,10 @@ Dependencies
   - [tweepy](https://pypi.org/project/tweepy/)
   - [Festival](https://www.cstr.ed.ac.uk/projects/festival/) (optional)
 
-
 [Detroit River Boat Tracker]: https://twitter.com/detroitships
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [Nooelec NESDR Smart v4]: https://www.nooelec.com/store/sdr/sdr-receivers/nesdr-smart-sdr.html
 [Raspberry Pi]: https://www.raspberrypi.org/
 [Raspberry Pi Camera Module]: https://www.raspberrypi.org/products/camera-module-v2/
-[rPiAIS]: https://www.aishub.net/rpiais
+[AIS Dispatcher for Linux]: https://www.aishub.net/ais-dispatcher?tab=linux
 [rtl-ais]: https://github.com/dgiardini/rtl-ais
