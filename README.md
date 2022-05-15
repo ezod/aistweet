@@ -4,6 +4,8 @@
 aistweet tracks ships via AIS and takes their picture with a Raspberry Pi
 camera as they pass by.
 
+Written for and powering the [Detroit River Boat Tracker].
+
 How To Build It
 ---------------
 
@@ -65,8 +67,10 @@ Dependencies
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
   - [tweepy](https://pypi.org/project/tweepy/)
+  - [Festival](https://www.cstr.ed.ac.uk/projects/festival/) (optional)
 
 
+[Detroit River Boat Tracker]: https://twitter.com/detroitships
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [Nooelec NESDR Smart v4]: https://www.nooelec.com/store/sdr/sdr-receivers/nesdr-smart-sdr.html
 [Raspberry Pi]: https://www.raspberrypi.org/
