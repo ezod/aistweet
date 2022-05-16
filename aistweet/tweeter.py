@@ -103,6 +103,11 @@ class Tweeter(object):
             pass
 
     def snap_and_tweet(self, mmsi):
+        # only tweet once while this ship is scheduled (60 second cooldown)
+        if mmsi in self.schedule and self.schedule[mmsi] is None:
+            return
+        self.schedule[mmsi] = None
+
         self.log(mmsi, "ship in view, tweeting...")
         with self.lock:
             # grab the image
