@@ -85,7 +85,7 @@ class Tweeter(object):
             try:
                 existing_event = self.schedule.pop(mmsi)
                 self.scheduler.cancel(existing_event)
-            except (KeyError, ValueError):
+            except (KeyError, ValueError, AttributeError):
                 pass
             self.schedule[mmsi] = self.scheduler.enter(
                 delta,
