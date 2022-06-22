@@ -77,7 +77,7 @@ class Tweeter(object):
             print("[{}] {}: {}".format(str(datetime.datetime.now()), shipname, message))
 
     def check(self, mmsi, t):
-        crossing = self.tracker.crossing_time(mmsi, self.direction)
+        crossing, depth = self.tracker.crossing(mmsi, self.direction)
         if crossing is None:
             return
         delta = crossing - time.time() - self.CAMERA_WARMUP - self.CAMERA_DELAY
@@ -91,7 +91,7 @@ class Tweeter(object):
                 delta,
                 1,
                 self.snap_and_tweet,
-                arguments=(mmsi,),
+                arguments=(mmsi, depth),
             )
             self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
 
@@ -102,7 +102,7 @@ class Tweeter(object):
         except KeyError:
             pass
 
-    def snap_and_tweet(self, mmsi):
+    def snap_and_tweet(self, mmsi, depth):
         # only tweet once while this ship is scheduled (60 second cooldown)
         if mmsi in self.schedule and self.schedule[mmsi] is None:
             return
@@ -110,9 +110,13 @@ class Tweeter(object):
 
         self.log(mmsi, "ship in view, tweeting...")
         with self.lock:
+            # determine whether this is a "large" ship in FOV (horiz. 62.2deg)
+            # large if ship length > 0.9 * tan(31.1) * distance to ship
+            large = self.tracker.dimensions(mmsi)[0] > (0.542915 * depth)
+
             # grab the image
             image_path = os.path.join("/tmp", "{}.jpg".format(mmsi))
-            self.snap(image_path, self.tracker.dimensions(mmsi)[0] > 210)
+            self.snap(image_path, large)
             self.log(mmsi, "image captured to {}".format(image_path))
 
             # tweet the image with info

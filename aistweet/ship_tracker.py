@@ -206,16 +206,16 @@ class ShipTracker(object):
 
             return (lat + lat_offset, lon + lon_offset)
 
-    def crossing_time(self, mmsi, direction):
+    def crossing(self, mmsi, direction):
         with self.lock:
             # check for speed above a nominal threhsold
             speed = self.ships[mmsi]["speed"]
             if speed is None or speed < 0.2:
-                return None
+                return None, None
 
             ship_lat, ship_lon = self.center_coords(mmsi)
             if not (-90.0 < ship_lat < 90.0 and -180.0 < ship_lon < 180.0):
-                return None
+                return None, None
 
             ship_dir = self.ships[mmsi]["course"]
 
@@ -278,10 +278,11 @@ class ShipTracker(object):
                 int_lon = math.degrees(int_lon_r)
 
                 d = distance((ship_lat, ship_lon), (int_lat, int_lon)).m
+                depth = distance((self.lat, self.lon), (int_lat, int_lon)).m
             except ValueError:
-                return None
+                return None, None
 
-            return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed)
+            return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed), depth
 
     def run(self):
         for msg in UDPReceiver(self.host, self.port):
