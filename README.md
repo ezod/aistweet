@@ -30,7 +30,7 @@ Command Line
 ------------
 ```
 usage: aistweet.py [-h] [--host HOST] [--port PORT] [--db DB]
-                   [--hashtags HASHTAGS [HASHTAGS ...]]
+                   [--hashtags HASHTAGS [HASHTAGS ...]] [--tts]
                    latitude longitude direction consumer_key consumer_secret
                    access_token access_token_secret
 

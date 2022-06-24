@@ -42,7 +42,7 @@ if __name__ == "__main__":
         help=("hashtags to add to tweets"),
     )
     parser.add_argument(
-        "--tts", action="store_true", help=("announce ship name via Festival TTS")
+        "--tts", action="store_true", help=("announce ship name via text-to-speech")
     )
     args = parser.parse_args()
 
