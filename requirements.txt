@@ -2,6 +2,7 @@ astral
 emoji-country-flag
 event-scheduler
 geopy
+gTTS
 picamera
 pyais
 pytz

@@ -6,6 +6,7 @@ import time
 
 import tweepy
 from event_scheduler import EventScheduler
+from gtts import gTTS
 from picamera import PiCamera
 
 import astral
@@ -138,7 +139,11 @@ class Tweeter(object):
             if self.tts:
                 shipname = self.tracker[mmsi]["shipname"]
                 if shipname:
-                    os.system("echo {} | festival --tts".format(shipname))
+                    speech_path = os.path.join("/tmp", "{}.mp3".format(mmsi))
+                    speech = gTTS(text=shipname, lang="en", slow=False)
+                    speech.save(speech_path)
+                    os.system("mpg321 -q {}".format(speech_path))
+                    os.remove(speech_path)
 
         self.log(mmsi, "done tweeting")
 
