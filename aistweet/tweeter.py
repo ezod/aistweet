@@ -140,7 +140,7 @@ class Tweeter(object):
                 shipname = self.tracker[mmsi]["shipname"]
                 if shipname:
                     speech_path = os.path.join("/tmp", "{}.mp3".format(mmsi))
-                    speech = gTTS(text=shipname, lang="en", slow=False)
+                    speech = gTTS(text=shipname.title(), lang="en", slow=False)
                     speech.save(speech_path)
                     os.system("mpg321 -q {}".format(speech_path))
                     os.remove(speech_path)
