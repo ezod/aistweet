@@ -4,7 +4,8 @@
 aistweet tracks ships via AIS and takes their picture with a Raspberry Pi
 camera as they pass by.
 
-Written for and powering the [Detroit River Boat Tracker].
+Written for and powering the [Detroit River Boat Tracker]. Read about
+[how it was made](howitworks.md)!
 
 How To Build It
 ---------------
