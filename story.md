@@ -119,14 +119,14 @@ arrives, the callback gets the crossing time from the tracker (minus the camera
 warmup and delay times), and schedules a photo-and-tweet for the appropriate
 moment if the boat is soon to cross the camera axis.
 
-The photo itself can appear a bit different depending on a couple of factors.
-First, the distance to the boat and the length of the boat are used to determine
-the "zoom" (region of interest) of the photo, using projective geometry and the
+The photo can appear a bit different depending on a couple of factors. First,
+the distance to the boat and the length of the boat are used to determine the
+"zoom" (region of interest) of the photo, using projective geometry and the
 known horizontal field of view of the [camera module]. Second, the exposure mode
 of the camera is normally set to "auto", but is set to "night" instead between
 dusk and dawn. This is determined using [astral], to which we feed the
 coordinates of the camera, the timezone at those coordinates as obtained from
-[timezonefinder], and the current local time using [pytz]. The capture itself
+[timezonefinder], and the current local time using [pytz]. The image capture
 is, of course, handled by [picamera].
 
 The tweet itself is posted using [tweepy], which interfaces with Twitter's API.
@@ -142,17 +142,18 @@ After launching the boat tracker, I often found myself checking the Twitter
 feed just to get the name of a boat I'd see passing my window. It occurred to
 me to add a cheap pair of speakers to the Raspberry Pi, and have it audibly
 announce the names of passing boats using [gTTS] and [mpg321]. It sounds just
-like my Google Home Mini!
+like my Google Nest Mini!
 
 Conclusion
 ----------
 
-I hope this case study of rapid development of a relatively straightforward and
-self-contained application, well-specified at the high level, with the details
-filled in by a process of cobbling together open-source Python modules, has been
-of some interest to you. There is a vast ecosystem of Python libraries out there
-for almost every imaginable thing, no matter how specific, and I hope I've
-inspired you to try bringing a high-level idea to fruition by leveraging them!
+I thought this project would make an interesting little case study of the rapid
+development of a relatively straightforward and self-contained application,
+well-specified at the high level, with the details filled in by a process of
+cobbling together open-source Python modules. There is a vast ecosystem of
+libraries out there for almost every imaginable thing, no matter how specific,
+and I hope I've inspired you to try bringing your own high-level idea to
+fruition by leveraging them!
 
 
 [AIS Dispatcher]: https://www.aishub.net/ais-dispatcher
