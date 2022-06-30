@@ -15,8 +15,8 @@ Origins: Discovering AIS
 ------------------------
 
 I discovered a conspicuous pair of signals at 161.975 MHz and 162.025 MHz during
-one of my first explorations of the waterfall pouring out of my new Nooelec
-NESDR Smart v4 USB dongle, but didn't look up what they were until I noticed
+one of my first explorations of the waterfall pouring out of my new [Nooelec
+NESDR SMArt v4] USB dongle, but didn't look up what they were until I noticed
 that a particularly strong signal seemed to coincide with a large boat passing
 directly across from my house. It turns out that these are the frequencies used
 by the [automatic identification system], or AIS, on which vessels broadcast
@@ -162,6 +162,7 @@ inspired you to try bringing a high-level idea to fruition by leveraging them!
 [Kalman filter]: https://en.wikipedia.org/wiki/Kalman_filter
 [MMSI]: https://en.wikipedia.org/wiki/Maritime_Mobile_Service_Identity
 [MarineTraffic]: https://www.marinetraffic.com/
+[Nooelec NESDR SMArt v4]: https://www.nooelec.com/store/sdr/sdr-receivers/nesdr-smart-sdr.html
 [Riverside Drive]: https://en.wikipedia.org/wiki/Riverside_Drive_(Windsor,_Ontario)
 [SQLite]: https://www.sqlite.org/index.html
 [Windsor]: https://en.wikipedia.org/wiki/Windsor,_Ontario
