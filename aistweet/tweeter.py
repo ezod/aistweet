@@ -179,7 +179,11 @@ class Tweeter(object):
         )
 
     def generate_text(self, mmsi):
-        text = u"{} ".format(self.tracker.flag(mmsi))
+        text = ""
+
+        flag = self.tracker.flag(mmsi)
+        if flag:
+            text += u"{} ".format(flag)
 
         ship = self.tracker[mmsi]
 

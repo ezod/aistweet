@@ -155,7 +155,7 @@ class ShipTracker(object):
         try:
             return flag.flag(self.countries[int(str(mmsi)[:3])])
         except KeyError:
-            return flag.flag("ZZ")
+            return None
 
     def ship_type(self, mmsi):
         with self.lock:
