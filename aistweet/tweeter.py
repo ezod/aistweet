@@ -18,7 +18,6 @@ from timezonefinder import TimezoneFinder
 class Tweeter(object):
     CAMERA_WARMUP = 1.0
     CAMERA_DELAY = 1.0
-    TWITTER_MAX_ATTEMPTS = 3
 
     def __init__(
         self,
@@ -122,19 +121,13 @@ class Tweeter(object):
             self.log(mmsi, "image captured to {}".format(image_path))
 
             # tweet the image with info
-            text = self.generate_text(mmsi)
             lat, lon = self.tracker.center_coords(mmsi)
-            attempts = 0
-            while attempts < self.TWITTER_MAX_ATTEMPTS:
-                try:
-                    self.twitter.update_status_with_media(
-                        text, image_path, lat=lat, long=lon
-                    )
-                    self.log(mmsi, "successfully tweeted")
-                    break
-                except tweepy.errors.TweepyException as e:
-                    self.log(mmsi, "tweet error: {}".format(e))
-                    attempts += 1
+            try:
+                self.twitter.update_status_with_media(
+                    self.generate_text(mmsi), image_path, lat=lat, long=lon
+                )
+            except tweepy.errors.TweepyException as e:
+                self.log(mmsi, "tweet error: {}".format(e))
 
             # clean up the image
             os.remove(image_path)
