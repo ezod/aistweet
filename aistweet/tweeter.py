@@ -3,19 +3,27 @@ import fractions
 import os
 import threading
 import time
-import board
-import busio
-import adafruit_veml7700
 
 import tweepy
 from event_scheduler import EventScheduler
-from gtts import gTTS
 from picamera import PiCamera
 
 import astral
 import astral.sun
 import pytz
 from timezonefinder import TimezoneFinder
+
+try:
+    from gtts import gTTS
+except ModuleNotFoundError:
+    gTTS = None
+
+try:
+    import board
+    import busio
+    import adafruit_veml7700
+except ModuleNotFoundError:
+    adafruit_veml7700 = None
 
 
 class Tweeter(object):
@@ -42,7 +50,7 @@ class Tweeter(object):
 
         self.hashtags = hashtags
 
-        self.tts = tts
+        self.tts = tts if gTTS is not None else False
 
         self.logging = logging
 
@@ -66,7 +74,7 @@ class Tweeter(object):
 
         # set up light sensor
         self.light_sensor = None
-        if light:
+        if light and adafruit_veml7700 is not None:
             i2c = busio.I2C(board.SCL, board.SDA)
             self.light_sensor = adafruit_veml7700.VEML7700(i2c)
 

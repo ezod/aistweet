@@ -60,18 +60,18 @@ optional arguments:
 
 Dependencies
 ------------
-  - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/)
   - [astral](https://pypi.org/project/astral/)
   - [emoji-country-flag](https://pypi.org/project/emoji-country-flag/)
   - [event-scheduler](https://pypi.org/project/event-scheduler/)
   - [geopy](https://pypi.org/project/geopy/)
-  - [gTTS](https://pypi.org/project/gTTS/)
   - [mpg321](http://mpg321.sourceforge.net/)
   - [picamera](https://pypi.org/project/picamera/)
   - [pyais](https://pypi.org/project/pyais/)
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
   - [tweepy](https://pypi.org/project/tweepy/)
+  - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/) (optional)
+  - [gTTS](https://pypi.org/project/gTTS/) (optional)
 
 [Detroit River Boat Tracker]: https://twitter.com/detroitships
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
