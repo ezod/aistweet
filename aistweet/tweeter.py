@@ -3,6 +3,9 @@ import fractions
 import os
 import threading
 import time
+import board
+import busio
+import adafruit_veml7700
 
 import tweepy
 from event_scheduler import EventScheduler
@@ -18,6 +21,7 @@ from timezonefinder import TimezoneFinder
 class Tweeter(object):
     CAMERA_WARMUP = 1.0
     CAMERA_DELAY = 1.0
+    LIGHT_LEVEL_MAX = 50
 
     def __init__(
         self,
@@ -29,6 +33,7 @@ class Tweeter(object):
         access_token_secret,
         hashtags=[],
         tts=False,
+        light=False,
         logging=True,
     ):
         self.tracker = tracker
@@ -58,6 +63,12 @@ class Tweeter(object):
 
         # set up camera
         self.camera = PiCamera()
+
+        # set up light sensor
+        self.light_sensor = None
+        if light:
+            i2c = busio.I2C(board.SCL, board.SDA)
+            self.light_sensor = adafruit_veml7700.VEML7700(i2c)
 
         # set up Twitter connection
         auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -117,7 +128,9 @@ class Tweeter(object):
 
             # grab the image
             image_path = os.path.join("/tmp", "{}.jpg".format(mmsi))
-            self.snap(image_path, large)
+            if not self.snap(image_path, large):
+                self.log(mmsi, "image capture aborted")
+                return
             self.log(mmsi, "image captured to {}".format(image_path))
 
             # tweet the image with info
@@ -159,6 +172,9 @@ class Tweeter(object):
             )
             now = self.now()
             if now < sun["dawn"] or now > sun["dusk"]:
+                if self.light_sensor is not None:
+                    if self.light_sensor.light > self.LIGHT_LEVEL_MAX:
+                        return False
                 self.camera.resolution = (1640, 1232)
                 self.camera.framerate = fractions.Fraction(2, 1)
                 self.camera.exposure_mode = "night"
@@ -172,6 +188,7 @@ class Tweeter(object):
             time.sleep(self.CAMERA_WARMUP)
             self.camera.capture(path)
             self.camera.stop_preview()
+            return True
 
     def now(self):
         return pytz.utc.localize(datetime.datetime.utcnow()).astimezone(

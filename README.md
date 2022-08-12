@@ -16,6 +16,7 @@ Things you will need:
   - a [Raspberry Pi Camera Module]
   - a USB SDR dongle, such as [Nooelec NESDR Smart v4]
   - a VHF antenna suitable for receiving [AIS] transmissions
+  - an [Adafruit VEML7700] ambient light sensor module (optional)
 
 Build and install [rtl-ais], and configure it to stream UDP data to the host
 and port defined by the aistweet command line.
@@ -54,10 +55,12 @@ optional arguments:
   --hashtags HASHTAGS [HASHTAGS ...]
                         hashtags to add to tweets
   --tts                 announce ship name via text-to-speech
+  --light               disable night snapshots via light sensor
 ```
 
 Dependencies
 ------------
+  - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/)
   - [astral](https://pypi.org/project/astral/)
   - [emoji-country-flag](https://pypi.org/project/emoji-country-flag/)
   - [event-scheduler](https://pypi.org/project/event-scheduler/)
@@ -75,5 +78,6 @@ Dependencies
 [Nooelec NESDR Smart v4]: https://www.nooelec.com/store/sdr/sdr-receivers/nesdr-smart-sdr.html
 [Raspberry Pi]: https://www.raspberrypi.org/
 [Raspberry Pi Camera Module]: https://www.raspberrypi.org/products/camera-module-v2/
+[Adafruit VEML7700]: http://learn.adafruit.com/adafruit-veml7700
 [AIS Dispatcher for Linux]: https://www.aishub.net/ais-dispatcher?tab=linux
 [rtl-ais]: https://github.com/dgiardini/rtl-ais

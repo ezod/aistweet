@@ -44,6 +44,11 @@ if __name__ == "__main__":
     parser.add_argument(
         "--tts", action="store_true", help=("announce ship name via text-to-speech")
     )
+    parser.add_argument(
+        "--light",
+        action="store_true",
+        help=("disable night snapshots via light sensor"),
+    )
     args = parser.parse_args()
 
     try:
@@ -59,6 +64,7 @@ if __name__ == "__main__":
             args.access_token_secret,
             args.hashtags,
             args.tts,
+            args.light,
         )
         forever = threading.Event()
         forever.wait()
