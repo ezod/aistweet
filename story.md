@@ -144,6 +144,19 @@ me to add a cheap pair of speakers to the Raspberry Pi, and have it audibly
 announce the names of passing boats using [gTTS] and [mpg321]. It sounds just
 like my Google Nest Mini!
 
+Bonus: Light Sensor
+-------------------
+
+One annoyance with the particular way I have the camera set up is that it
+directly faces the inside of my office window. Normally, this isn't a problem,
+but if I have the office lights on at night, the camera sees a rather clear
+reflection of the inside of my office and not much else. I've had to manually
+disable the tracker and/or delete tweets as a result. Adding a simple low-cost
+light sensor (the [Adafruit VEML7700] module), connecting it to the Pi via I2C,
+and writing some simple logic using Adafruit's CircuitPython interface was a
+breeze. The tracker now detects when the lights are on in my office at night,
+and aborts the image capture accordingly.
+
 Conclusion
 ----------
 
@@ -157,6 +170,7 @@ fruition by leveraging them!
 
 
 [AIS Dispatcher]: https://www.aishub.net/ais-dispatcher
+[Adafruit VEML7700]: https://learn.adafruit.com/adafruit-veml7700
 [Automatic Identification System]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [Detroit River]: https://en.wikipedia.org/wiki/Detroit_River
 [Detroit River Boat Tracker]: https://twitter.com/detroitships
