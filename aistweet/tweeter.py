@@ -14,9 +14,9 @@ import pytz
 from timezonefinder import TimezoneFinder
 
 try:
-    from gtts import gTTS
+    import gtts
 except ModuleNotFoundError:
-    gTTS = None
+    gtts = None
 
 try:
     import board
@@ -50,7 +50,7 @@ class Tweeter(object):
 
         self.hashtags = hashtags
 
-        self.tts = tts if gTTS is not None else False
+        self.tts = tts if gtts is not None else False
 
         self.logging = logging
 
@@ -161,10 +161,13 @@ class Tweeter(object):
                 shipname = self.tracker[mmsi]["shipname"]
                 if shipname:
                     speech_path = os.path.join("/tmp", "{}.mp3".format(mmsi))
-                    speech = gTTS(text=shipname.title(), lang="en", slow=False)
-                    speech.save(speech_path)
-                    os.system("mpg321 -q {}".format(speech_path))
-                    os.remove(speech_path)
+                    try:
+                        speech = gtts.gTTS(text=shipname.title(), lang="en", slow=False)
+                        speech.save(speech_path)
+                        os.system("mpg321 -q {}".format(speech_path))
+                        os.remove(speech_path)
+                    except gtts.tts.gTTSError:
+                        pass
 
         self.log(mmsi, "done tweeting")
 
