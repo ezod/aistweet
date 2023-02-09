@@ -5,7 +5,7 @@ aistweet tracks ships via AIS and takes their picture with a Raspberry Pi
 camera as they pass by.
 
 Written for and powering the [Detroit River Boat Tracker]. Read about
-[how it was made](story.md)!
+[how it was made]!
 
 How To Build It
 ---------------
@@ -81,3 +81,4 @@ Dependencies
 [Adafruit VEML7700]: http://learn.adafruit.com/adafruit-veml7700
 [AIS Dispatcher for Linux]: https://www.aishub.net/ais-dispatcher?tab=linux
 [rtl-ais]: https://github.com/dgiardini/rtl-ais
+[how it was made]: https://www.prosiglieres.com/posts/detroit-river-boat-tracker-project/
