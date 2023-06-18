@@ -144,8 +144,12 @@ class Tweeter(object):
             # tweet the image with info
             lat, lon = self.tracker.center_coords(mmsi)
             try:
-                self.twitter.update_status_with_media(
-                    self.generate_text(mmsi), image_path, lat=lat, long=lon
+                media = self.twitter.media_upload(filename=image_path)
+                self.twitter.update_status(
+                    status=self.generate_text(mmsi),
+                    media_ids=[media.media_id_string],
+                    lat=lat,
+                    long=lon,
                 )
             except tweepy.errors.TweepyException as e:
                 self.log(mmsi, "tweet error: {}".format(e))
