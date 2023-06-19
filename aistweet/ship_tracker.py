@@ -1,16 +1,14 @@
 import csv
-import math
 import threading
 import time
 from pkg_resources import resource_filename
 
 import flag
 import sqlite3
-from geopy.distance import distance
 from pyais.ais_types import AISType
 from pyais.stream import UDPReceiver
 
-from aistweet.units import kn_to_m_s, m_to_lat, m_to_lon
+from aistweet.geometry import center_coordinates, crossing_time_and_depth
 
 
 class ShipTracker(object):
@@ -176,7 +174,7 @@ class ShipTracker(object):
             try:
                 return (
                     self.ships[mmsi]["to_bow"] + self.ships[mmsi]["to_stern"],
-                    self.ships[mmsi]["to_port"] + self.ships[mmsi]["to_starboard"],
+                    self.ships[mmsi]["to_starboard"] + self.ships[mmsi]["to_port"],
                 )
             except TypeError:
                 return (0, 0)
@@ -189,22 +187,15 @@ class ShipTracker(object):
             if lat is None or lon is None:
                 return None
 
-            # offset of ship center in meters relative to ship coordinate frame
-            length, width = self.dimensions(mmsi)
-            l_offset = (length / 2.0) - (self.ships[mmsi]["to_stern"] or 0)
-            w_offset = (width / 2.0) - (self.ships[mmsi]["to_port"] or 0)
+            to_bow = self.ships[mmsi]["to_bow"] or 0
+            to_stern = self.ships[mmsi]["to_stern"] or 0
+            to_starboard = self.ships[mmsi]["to_starboard"] or 0
+            to_port = self.ships[mmsi]["to_port"] or 0
+            heading = self.ships[mmsi]["heading"] or 0
 
-            # longitude and latitude offsets rotated by ship heading
-            # (heading is expressed in clockwise degrees from north)
-            theta = math.radians(-(self.ships[mmsi]["heading"] or 0) % 360)
-            lat_offset = m_to_lat(
-                w_offset * math.sin(theta) + l_offset * math.cos(theta)
+            return center_coordinates(
+                lat, lon, to_bow, to_stern, to_starboard, to_port, heading
             )
-            lon_offset = m_to_lon(
-                w_offset * math.cos(theta) - l_offset * math.sin(theta), lat
-            )
-
-            return (lat + lat_offset, lon + lon_offset)
 
     def crossing(self, mmsi, direction):
         with self.lock:
@@ -217,72 +208,15 @@ class ShipTracker(object):
             if not (-90.0 < ship_lat < 90.0 and -180.0 < ship_lon < 180.0):
                 return None, None
 
-            ship_dir = self.ships[mmsi]["course"]
-
-            # convert to radians
-            self_lat_r = math.radians(self.lat)
-            self_lon_r = math.radians(self.lon)
-            self_dir_r = math.radians(direction)
-            ship_lat_r = math.radians(ship_lat)
-            ship_lon_r = math.radians(ship_lon)
-            ship_dir_r = math.radians(ship_dir)
-
-            try:
-                # compute intersection point (http://www.movable-type.co.uk/scripts/latlong.html)
-                d_12 = 2.0 * math.asin(
-                    math.sqrt(
-                        math.sin((self_lat_r - ship_lat_r) / 2.0) ** 2
-                        + math.cos(self_lat_r)
-                        * math.cos(ship_lat_r)
-                        * math.sin((self_lon_r - ship_lon_r) / 2.0) ** 2
-                    )
-                )
-
-                t_a = math.acos(
-                    (math.sin(ship_lat_r) - math.sin(self_lat_r) * math.cos(d_12))
-                    / (math.sin(d_12) * math.cos(self_lat_r))
-                )
-                t_b = math.acos(
-                    (math.sin(self_lat_r) - math.sin(ship_lat_r) * math.cos(d_12))
-                    / (math.sin(d_12) * math.cos(ship_lat_r))
-                )
-
-                if math.sin(ship_lon_r - self_lon_r) > 0.0:
-                    t_12 = t_a
-                    t_21 = math.tau - t_b
-                else:
-                    t_12 = math.tau - t_a
-                    t_21 = t_b
-
-                a_1 = self_dir_r - t_12
-                a_2 = t_21 - ship_dir_r
-                a_3 = math.acos(
-                    -math.cos(a_1) * math.cos(a_2)
-                    + math.sin(a_1) * math.sin(a_2) * math.cos(d_12)
-                )
-                d_13 = math.atan2(
-                    math.sin(d_12) * math.sin(a_1) * math.sin(a_2),
-                    math.cos(a_2) + math.cos(a_1) * math.cos(a_3),
-                )
-
-                int_lat_r = math.asin(
-                    math.sin(self_lat_r) * math.cos(d_13)
-                    + math.cos(self_lat_r) * math.sin(d_13) * math.cos(self_dir_r)
-                )
-                int_lon_r = self_lon_r + math.atan2(
-                    math.sin(self_dir_r) * math.sin(d_13) * math.cos(self_lat_r),
-                    math.cos(d_13) - math.sin(self_lat_r) * math.sin(int_lat_r),
-                )
-
-                int_lat = math.degrees(int_lat_r)
-                int_lon = math.degrees(int_lon_r)
-
-                d = distance((ship_lat, ship_lon), (int_lat, int_lon)).m
-                depth = distance((self.lat, self.lon), (int_lat, int_lon)).m
-            except ValueError:
-                return None, None
-
-            return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed), depth
+            return crossing_time_and_depth(
+                self.lat,
+                self.lon,
+                direction,
+                ship_lat,
+                ship_lon,
+                self.ships[mmsi]["course"],
+                self.ships[mmsi]["last_update"],
+            )
 
     def run(self):
         for msg in UDPReceiver(self.host, self.port):
