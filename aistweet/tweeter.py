@@ -215,7 +215,7 @@ class Tweeter(object):
 
         flag = self.tracker.flag(mmsi)
         if flag:
-            text += u"{} ".format(flag)
+            text += "{} ".format(flag)
 
         ship = self.tracker[mmsi]
 
@@ -225,32 +225,32 @@ class Tweeter(object):
         else:
             text += "(Unidentified)"
 
-        text += u", {}".format(self.tracker.ship_type(mmsi))
+        text += ", {}".format(self.tracker.ship_type(mmsi))
 
         length, width = self.tracker.dimensions(mmsi)
         if length > 0 and width > 0:
-            text += u" ({l} x {w} m)".format(l=length, w=width)
+            text += " ({l} x {w} m)".format(l=length, w=width)
 
         status = self.tracker.status(mmsi)
         if status is not None:
-            text += u", {}".format(status)
+            text += ", {}".format(status)
 
         destination = ship["destination"]
         if destination:
-            text += u", destination: {}".format(destination)
+            text += ", destination: {}".format(destination)
 
         course = ship["course"]
         speed = ship["speed"]
         if course is not None and speed is not None:
-            text += u", course: {c:.1f} \N{DEGREE SIGN} / speed: {s:.1f} kn".format(
+            text += ", course: {c:.1f} \N{DEGREE SIGN} / speed: {s:.1f} kn".format(
                 c=course, s=speed
             )
 
-        text += u" https://www.marinetraffic.com/en/ais/details/ships/mmsi:{}".format(
+        text += " https://www.marinetraffic.com/en/ais/details/ships/mmsi:{}".format(
             mmsi
         )
 
         for hashtag in self.hashtags:
-            text += u" #{}".format(hashtag)
+            text += " #{}".format(hashtag)
 
         return text
