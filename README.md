@@ -83,7 +83,7 @@ Dependencies
   - [pyais](https://pypi.org/project/pyais/)
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
-  - [tweeter-basic](https://github.com/MikeBusuttil/tweeter-basic)
+  - [tweeter-basic]
   - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/) (optional)
   - [gTTS](https://pypi.org/project/gTTS/) (optional)
 
@@ -95,4 +95,5 @@ Dependencies
 [Adafruit VEML7700]: http://learn.adafruit.com/adafruit-veml7700
 [AIS Dispatcher for Linux]: https://www.aishub.net/ais-dispatcher?tab=linux
 [rtl-ais]: https://github.com/dgiardini/rtl-ais
+[tweeter-basic]: https://github.com/MikeBusuttil/tweeter-basic
 [how it was made]: https://www.prosiglieres.com/posts/detroit-river-boat-tracker-project/
