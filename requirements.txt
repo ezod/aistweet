@@ -5,4 +5,4 @@ geopy
 pyais
 pytz
 timezonefinder
-tweepy
+tweeter-basic

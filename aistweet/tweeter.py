@@ -4,7 +4,7 @@ import os
 import threading
 import time
 
-import tweepy
+from Tweet import Tweet
 from event_scheduler import EventScheduler
 
 import astral
@@ -36,17 +36,7 @@ class Tweeter(object):
     LIGHT_LEVEL_MAX = 50
 
     def __init__(
-        self,
-        tracker,
-        direction,
-        consumer_key,
-        consumer_secret,
-        access_token,
-        access_token_secret,
-        hashtags=[],
-        tts=False,
-        light=False,
-        logging=True,
+        self, tracker, direction, hashtags=[], tts=False, light=False, logging=True
     ):
         self.tracker = tracker
 
@@ -83,9 +73,11 @@ class Tweeter(object):
             self.light_sensor = adafruit_veml7700.VEML7700(i2c)
 
         # set up Twitter connection
-        auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
-        auth.set_access_token(access_token, access_token_secret)
-        self.twitter = tweepy.API(auth)
+        self.twitter = Tweet(
+            client_id=environ["TWITTER_CLIENT_ID"],
+            client_secret=environ["TWITTER_CLIENT_SECRET"],
+            callback_uri=environ["TWITTER_CALLBACK_URI"],
+        )
 
         self.scheduler.start()
 
@@ -112,10 +104,7 @@ class Tweeter(object):
             except (KeyError, ValueError, AttributeError):
                 pass
             self.schedule[mmsi] = self.scheduler.enter(
-                delta,
-                1,
-                self.snap_and_tweet,
-                arguments=(mmsi, depth),
+                delta, 1, self.snap_and_tweet, arguments=(mmsi, depth)
             )
             self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
 
@@ -148,10 +137,13 @@ class Tweeter(object):
             # tweet the image with info
             lat, lon = self.tracker.center_coords(mmsi)
             try:
-                self.twitter.update_status_with_media(
-                    self.generate_text(mmsi), image_path, lat=lat, long=lon
+                self.twitter.tweet(
+                    text=self.generate_text(mmsi),
+                    image_path=image_path,
+                    lat=lat,
+                    long=lon,
                 )
-            except tweepy.errors.TweepyException as e:
+            except Exception as e:
                 self.log(mmsi, "tweet error: {}".format(e))
 
             # clean up the image

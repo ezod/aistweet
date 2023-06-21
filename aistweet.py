@@ -18,12 +18,6 @@ if __name__ == "__main__":
         type=float,
         help=("bearing of camera (degrees clockwise from north)"),
     )
-    parser.add_argument("consumer_key", type=str, help=("Twitter consumer key"))
-    parser.add_argument("consumer_secret", type=str, help=("Twitter consumer secret"))
-    parser.add_argument("access_token", type=str, help=("Twitter access token"))
-    parser.add_argument(
-        "access_token_secret", type=str, help=("Twitter access token secret")
-    )
     parser.add_argument(
         "--host",
         type=str,
@@ -58,10 +52,6 @@ if __name__ == "__main__":
         tweeter = Tweeter(
             tracker,
             args.direction,
-            args.consumer_key,
-            args.consumer_secret,
-            args.access_token,
-            args.access_token_secret,
             args.hashtags,
             args.tts,
             args.light,
