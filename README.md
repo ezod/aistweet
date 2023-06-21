@@ -33,8 +33,7 @@ Command Line
 ```
 usage: aistweet.py [-h] [--host HOST] [--port PORT] [--db DB]
                    [--hashtags HASHTAGS [HASHTAGS ...]] [--tts]
-                   latitude longitude direction consumer_key consumer_secret
-                   access_token access_token_secret
+                   latitude longitude
 
 Raspberry Pi AIS tracker/camera Twitter bot
 
@@ -42,10 +41,6 @@ positional arguments:
   latitude              AIS station latitude
   longitude             AIS station longitude
   direction             bearing of camera (degrees clockwise from north)
-  consumer_key          Twitter consumer key
-  consumer_secret       Twitter consumer secret
-  access_token          Twitter access token
-  access_token_secret   Twitter access token secret
 
 optional arguments:
   -h, --help            show this help message and exit
@@ -56,7 +51,26 @@ optional arguments:
                         hashtags to add to tweets
   --tts                 announce ship name via text-to-speech
   --light               disable night snapshots via light sensor
+
+required environment variables:
+  TWITTER_CONSUMER_API_KEY
+  TWITTER_CONSUMER_API_KEY_SECRET
+  TWITTER_ACCESS_TOKEN
+  TWITTER_ACCESS_TOKEN_SECRET
+  TWITTER_CLIENT_ID
+  TWITTER_CLIENT_SECRET
+  TWITTER_CALLBACK_URI
 ```
+
+How To Authenticate With Twitter
+--------------------------------
+
+Follow the instructions on the [tweeter-basic repo](https://github.com/MikeBusuttil/tweeter-basic) to:
+- create a Twitter v2 API project
+- generate the required keys to be set as environment variables
+  - note: the callback URI is recommended to be http://localhost/callback
+- generate the required token by doing a 1-time self-hosted browser authentication
+  - note: the token is auto-refreshed with every tweet.  However, if the token isn't refreshed in 6 months it will require user intervention to be re-generated.
 
 Dependencies
 ------------
@@ -69,7 +83,7 @@ Dependencies
   - [pyais](https://pypi.org/project/pyais/)
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
-  - [tweepy](https://pypi.org/project/tweepy/)
+  - [tweeter-basic](https://github.com/MikeBusuttil/tweeter-basic)
   - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/) (optional)
   - [gTTS](https://pypi.org/project/gTTS/) (optional)
 
