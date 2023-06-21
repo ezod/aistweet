@@ -1,4 +1,5 @@
 import math
+from typing import Tuple
 
 from geopy.distance import distance
 
@@ -13,7 +14,7 @@ def center_coordinates(
     to_starboard: float,
     to_port: float,
     heading: float,
-) -> tuple[float, float]:
+) -> Tuple[float, float]:
     """Calculate the latitude and longitude of a vessel's physical center point."""
     # offset of vessel center in meters relative to vessel coordinate frame
     l_offset = ((to_bow + to_stern) / 2.0) - to_stern
@@ -36,7 +37,7 @@ def crossing_time_and_depth(
     vessel_lon: float,
     vessel_course: float,
     t: float,
-) -> tuple[float, float]:
+) -> Tuple[float, float]:
     """Calculate the time and depth at which a vessel will cross the camera axis."""
     # convert to radians
     camera_lat_r = math.radians(camera_lat)
