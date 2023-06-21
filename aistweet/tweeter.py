@@ -32,13 +32,7 @@ class Tweeter(object):
     LIGHT_LEVEL_MAX = 50
 
     def __init__(
-        self,
-        tracker,
-        direction,
-        hashtags=[],
-        tts=False,
-        light=False,
-        logging=True,
+        self, tracker, direction, hashtags=[], tts=False, light=False, logging=True
     ):
         self.tracker = tracker
 
@@ -78,7 +72,7 @@ class Tweeter(object):
         self.twitter = Tweet(
             client_id=environ["TWITTER_CLIENT_ID"],
             client_secret=environ["TWITTER_CLIENT_SECRET"],
-            callback_uri=environ["TWITTER_CALLBACK_URI"]
+            callback_uri=environ["TWITTER_CALLBACK_URI"],
         )
 
         self.scheduler.start()
@@ -106,10 +100,7 @@ class Tweeter(object):
             except (KeyError, ValueError, AttributeError):
                 pass
             self.schedule[mmsi] = self.scheduler.enter(
-                delta,
-                1,
-                self.snap_and_tweet,
-                arguments=(mmsi, depth),
+                delta, 1, self.snap_and_tweet, arguments=(mmsi, depth)
             )
             self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
 
@@ -144,7 +135,9 @@ class Tweeter(object):
             try:
                 self.twitter.tweet(
                     text=self.generate_text(mmsi),
-                    image_path=image_path, lat=lat, long=lon
+                    image_path=image_path,
+                    lat=lat,
+                    long=lon,
                 )
             except Exception as e:
                 self.log(mmsi, "tweet error: {}".format(e))
