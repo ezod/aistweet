@@ -9,4 +9,17 @@ authors = [
 ]
 description = "Twitter photo bot for Raspberry Pi AIS tracking stations"
 readme = "README.md"
-dynamic = ["version"]
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Communications :: Ham Radio",
+]
+dynamic = ["version", "dependencies"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
