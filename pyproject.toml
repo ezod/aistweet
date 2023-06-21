@@ -21,5 +21,10 @@ classifiers = [
 ]
 dynamic = ["version", "dependencies"]
 
+[project.optional-dependencies]
+light = ["adafruit-circuitpython-veml7700"]
+tts = ["gtts"]
+pi = ["picamera"]
+
 [tool.setuptools.dynamic]
 dependencies = {file = ["requirements.txt"]}
