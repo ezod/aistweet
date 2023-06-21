@@ -65,7 +65,7 @@ required environment variables:
 How To Authenticate With Twitter
 --------------------------------
 
-Follow the instructions on the [tweeter-basic repo](https://github.com/MikeBusuttil/tweeter-basic) to:
+Follow the instructions on the [tweeter-basic] repository to:
 - create a Twitter v2 API project
 - generate the required keys to be set as environment variables
   - note: the callback URI is recommended to be http://localhost/callback
