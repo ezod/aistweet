@@ -1,10 +1,7 @@
-adafruit-circuitpython-veml7700[light]
 astral
 emoji-country-flag
 event-scheduler
 geopy
-gtts[tts]
-picamera
 pyais
 pytz
 timezonefinder

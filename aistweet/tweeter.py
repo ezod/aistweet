@@ -6,12 +6,16 @@ import time
 
 from Tweet import Tweet
 from event_scheduler import EventScheduler
-from picamera import PiCamera
 
 import astral
 import astral.sun
 import pytz
 from timezonefinder import TimezoneFinder
+
+try:
+    from picamera import PiCamera
+except ModuleNotFoundError:
+    PiCamera = lambda: None
 
 try:
     import gtts
@@ -171,6 +175,9 @@ class Tweeter(object):
         self.log(mmsi, "done tweeting")
 
     def snap(self, path, large):
+        if self.camera is None:
+            return False
+
         with self.lock:
             # set zoom based on ship size
             self.camera.zoom = (0.0, 0.0, 1.0, 1.0) if large else (0.25, 0.35, 0.5, 0.5)
