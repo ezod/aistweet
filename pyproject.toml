@@ -1,6 +1,30 @@
 [build-system]
-requires = [
-    "setuptools>=42",
-    "wheel"
-]
+requires = ["setuptools", "wheel"]
 build-backend = "setuptools.build_meta"
+
+[project]
+name = "aistweet"
+authors = [
+    {name = "Aaron Mavrinac", email = "mavrinac@gmail.com"},
+]
+description = "Twitter photo bot for Raspberry Pi AIS tracking stations"
+readme = "README.md"
+requires-python = ">=3.7"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Environment :: Console",
+    "Intended Audience :: System Administrators",
+    "Natural Language :: English",
+    "Development Status :: 4 - Beta",
+    "License :: OSI Approved :: GNU General Public License v3 (GPLv3)",
+    "Topic :: Communications :: Ham Radio",
+]
+dynamic = ["version", "dependencies"]
+
+[project.optional-dependencies]
+light = ["adafruit-circuitpython-veml7700"]
+tts = ["gtts"]
+pi = ["picamera"]
+
+[tool.setuptools.dynamic]
+dependencies = {file = ["requirements.txt"]}
