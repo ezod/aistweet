@@ -1,8 +1,8 @@
 astral
+atproto
 emoji-country-flag
 event-scheduler
 geopy
 pyais
 pytz
 timezonefinder
-tweeter-basic

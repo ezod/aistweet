@@ -7,7 +7,7 @@ name = "aistweet"
 authors = [
     {name = "Aaron Mavrinac", email = "mavrinac@gmail.com"},
 ]
-description = "Twitter photo bot for Raspberry Pi AIS tracking stations"
+description = "Bluesky photo bot for Raspberry Pi AIS tracking stations"
 readme = "README.md"
 requires-python = ">=3.7"
 classifiers = [

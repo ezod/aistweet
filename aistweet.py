@@ -9,7 +9,7 @@ from aistweet.tweeter import Tweeter
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
-        description="Raspberry Pi AIS tracker/camera Twitter bot"
+        description="Raspberry Pi AIS tracker/camera Bluesky bot"
     )
     parser.add_argument("latitude", type=float, help=("AIS station latitude"))
     parser.add_argument("longitude", type=float, help=("AIS station longitude"))

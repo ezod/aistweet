@@ -4,7 +4,7 @@ import os
 import threading
 import time
 
-from Tweet import Tweet
+from atproto import Client, models
 from event_scheduler import EventScheduler
 
 import astral
@@ -36,7 +36,13 @@ class Tweeter(object):
     LIGHT_LEVEL_MAX = 50
 
     def __init__(
-        self, tracker, direction, hashtags=[], tts=False, light=False, logging=True
+        self,
+        tracker,
+        direction,
+        hashtags=[],
+        tts=False,
+        light=False,
+        logging=True,
     ):
         self.tracker = tracker
 
@@ -72,13 +78,6 @@ class Tweeter(object):
             i2c = busio.I2C(board.SCL, board.SDA)
             self.light_sensor = adafruit_veml7700.VEML7700(i2c)
 
-        # set up Twitter connection
-        self.twitter = Tweet(
-            client_id=environ["TWITTER_CLIENT_ID"],
-            client_secret=environ["TWITTER_CLIENT_SECRET"],
-            callback_uri=environ["TWITTER_CALLBACK_URI"],
-        )
-
         self.scheduler.start()
 
         # register callback
@@ -89,8 +88,11 @@ class Tweeter(object):
 
     def log(self, mmsi, message):
         if self.logging:
-            shipname = self.tracker[mmsi]["shipname"]
-            print("[{}] {}: {}".format(str(datetime.datetime.now()), shipname, message))
+            print(
+                "[{}] {}: {}".format(
+                    str(datetime.datetime.now()), self.shipname(mmsi), message
+                )
+            )
 
     def check(self, mmsi, t):
         crossing, depth = self.tracker.crossing(mmsi, self.direction)
@@ -134,17 +136,37 @@ class Tweeter(object):
                 return
             self.log(mmsi, "image captured to {}".format(image_path))
 
-            # tweet the image with info
-            lat, lon = self.tracker.center_coords(mmsi)
+            # set up Bluesky connection
+            username = os.getenv("BLUESKY_USERNAME")
+            password = os.getenv("BLUESKY_PASSWORD")
+            client = Client("https://bsky.social")
+            client.login(username, password)
+
+            # create post
             try:
-                self.twitter.tweet(
-                    text=self.generate_text(mmsi),
-                    image_path=image_path,
-                    lat=lat,
-                    long=lon,
+                # TODO: add geolocation
+                # lat, lon = self.tracker.center_coords(mmsi)
+                with open(image_path, "rb") as image_file:
+                    upload = client.upload_blob(image_file)
+                images = [
+                    models.AppBskyEmbedImages.Image(
+                        alt=self.shipname(mmsi), image=upload.blob
+                    )
+                ]
+                embed = models.AppBskyEmbedImages.Main(images=images)
+                client.com.atproto.repo.create_record(
+                    models.ComAtprotoRepoCreateRecord.Data(
+                        repo=client.me.did,
+                        collection=models.ids.AppBskyFeedPost,
+                        record=models.AppBskyFeedPost.Record(
+                            created_at=client.get_current_time_iso(),
+                            text=self.generate_text(mmsi),
+                            embed=embed,
+                        ),
+                    )
                 )
             except Exception as e:
-                self.log(mmsi, "tweet error: {}".format(e))
+                self.log(mmsi, "post error: {}".format(e))
 
             # clean up the image
             os.remove(image_path)
@@ -154,16 +176,16 @@ class Tweeter(object):
 
             # announce the ship using TTS
             if self.tts:
-                shipname = self.tracker[mmsi]["shipname"]
-                if shipname:
-                    speech_path = os.path.join("/tmp", "{}.mp3".format(mmsi))
-                    try:
-                        speech = gtts.gTTS(text=shipname.title(), lang="en", slow=False)
-                        speech.save(speech_path)
-                        os.system("mpg321 -q {}".format(speech_path))
-                        os.remove(speech_path)
-                    except gtts.tts.gTTSError:
-                        pass
+                speech_path = os.path.join("/tmp", "{}.mp3".format(mmsi))
+                try:
+                    speech = gtts.gTTS(
+                        text=self.shipname(mmsi).title(), lang="en", slow=False
+                    )
+                    speech.save(speech_path)
+                    os.system("mpg321 -q {}".format(speech_path))
+                    os.remove(speech_path)
+                except gtts.tts.gTTSError:
+                    pass
 
         self.log(mmsi, "done tweeting")
 
@@ -205,6 +227,9 @@ class Tweeter(object):
             pytz.timezone(self.location.timezone)
         )
 
+    def shipname(self, mmsi):
+        return self.tracker[mmsi]["shipname"] or "(Unidentified)"
+
     def generate_text(self, mmsi):
         text = ""
 
@@ -214,12 +239,7 @@ class Tweeter(object):
 
         ship = self.tracker[mmsi]
 
-        shipname = ship["shipname"]
-        if shipname:
-            text += shipname
-        else:
-            text += "(Unidentified)"
-
+        text += self.shipname(mmsi)
         text += ", {}".format(self.tracker.ship_type(mmsi))
 
         length, width = self.tracker.dimensions(mmsi)
