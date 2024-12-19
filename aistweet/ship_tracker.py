@@ -214,6 +214,7 @@ class ShipTracker(object):
                 direction,
                 ship_lat,
                 ship_lon,
+                self.ships[mmsi]["speed"],
                 self.ships[mmsi]["course"],
                 self.ships[mmsi]["last_update"],
             )
