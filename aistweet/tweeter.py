@@ -29,6 +29,8 @@ try:
 except ModuleNotFoundError:
     adafruit_veml7700 = None
 
+from aistweet.compress import resize_and_compress
+
 
 class Tweeter(object):
     CAMERA_WARMUP = 1.0
@@ -134,6 +136,7 @@ class Tweeter(object):
             if not self.snap(image_path, large):
                 self.log(mmsi, "image capture aborted")
                 return
+            resize_and_compress(image_path, image_path, 1000000, (1640, 1232))
             self.log(mmsi, "image captured to {}".format(image_path))
 
             # set up Bluesky connection
