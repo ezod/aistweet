@@ -60,6 +60,7 @@ required environment variables:
 Dependencies
 ------------
   - [astral](https://pypi.org/project/astral/)
+  - [atproto](https://pypi.org/project/atproto/)
   - [emoji-country-flag](https://pypi.org/project/emoji-country-flag/)
   - [event-scheduler](https://pypi.org/project/event-scheduler/)
   - [geopy](https://pypi.org/project/geopy/)
@@ -68,7 +69,6 @@ Dependencies
   - [pyais](https://pypi.org/project/pyais/)
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
-  - [tweeter-basic]
   - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/) (optional)
   - [gTTS](https://pypi.org/project/gTTS/) (optional)
 
