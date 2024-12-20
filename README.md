@@ -47,8 +47,6 @@ optional arguments:
   --host HOST           host for receiving UDP AIS messages
   --port PORT           port for receiving UDP AIS messages
   --db DB               database file for static ship data
-  --hashtags HASHTAGS [HASHTAGS ...]
-                        hashtags to add to tweets
   --tts                 announce ship name via text-to-speech
   --light               disable night snapshots via light sensor
 

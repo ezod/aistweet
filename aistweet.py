@@ -29,13 +29,6 @@ if __name__ == "__main__":
     )
     parser.add_argument("--db", type=str, help=("database file for static ship data"))
     parser.add_argument(
-        "--hashtags",
-        type=str,
-        nargs="+",
-        default=[],
-        help=("hashtags to add to tweets"),
-    )
-    parser.add_argument(
         "--tts", action="store_true", help=("announce ship name via text-to-speech")
     )
     parser.add_argument(
@@ -52,7 +45,6 @@ if __name__ == "__main__":
         tweeter = Tweeter(
             tracker,
             args.direction,
-            args.hashtags,
             args.tts,
             args.light,
         )

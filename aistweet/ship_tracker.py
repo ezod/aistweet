@@ -74,7 +74,7 @@ class ShipTracker(object):
     @staticmethod
     def readcsv(filename):
         d = {}
-        path = resource_filename("aistweet", "data/{}.csv".format(filename))
+        path = resource_filename("aistweet", f"data/{filename}.csv")
         with open(path, newline="") as f:
             reader = csv.reader(f)
             for row in reader:
