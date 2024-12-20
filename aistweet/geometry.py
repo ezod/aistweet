@@ -35,6 +35,7 @@ def crossing_time_and_depth(
     camera_heading: float,
     vessel_lat: float,
     vessel_lon: float,
+    vessel_speed: float,
     vessel_course: float,
     t: float,
 ) -> Tuple[float, float]:
@@ -98,8 +99,8 @@ def crossing_time_and_depth(
         int_lon = math.degrees(int_lon_r)
 
         d = distance((vessel_lat, vessel_lon), (int_lat, int_lon)).m
-        depth = distance((self.lat, self.lon), (int_lat, int_lon)).m
+        depth = distance((camera_lat, camera_lon), (int_lat, int_lon)).m
     except ValueError:
         return None, None
 
-    return self.ships[mmsi]["last_update"] + d / kn_to_m_s(speed), depth
+    return t + d / kn_to_m_s(vessel_speed), depth

@@ -4,7 +4,7 @@ import os
 import threading
 import time
 
-from Tweet import Tweet
+from atproto import Client, models
 from event_scheduler import EventScheduler
 
 import astral
@@ -29,6 +29,8 @@ try:
 except ModuleNotFoundError:
     adafruit_veml7700 = None
 
+from aistweet.compress import resize_and_compress
+
 
 class Tweeter(object):
     CAMERA_WARMUP = 1.0
@@ -36,13 +38,16 @@ class Tweeter(object):
     LIGHT_LEVEL_MAX = 50
 
     def __init__(
-        self, tracker, direction, hashtags=[], tts=False, light=False, logging=True
+        self,
+        tracker,
+        direction,
+        tts=False,
+        light=False,
+        logging=True,
     ):
         self.tracker = tracker
 
         self.direction = direction
-
-        self.hashtags = hashtags
 
         self.tts = tts if gtts is not None else False
 
@@ -72,13 +77,6 @@ class Tweeter(object):
             i2c = busio.I2C(board.SCL, board.SDA)
             self.light_sensor = adafruit_veml7700.VEML7700(i2c)
 
-        # set up Twitter connection
-        self.twitter = Tweet(
-            client_id=environ["TWITTER_CLIENT_ID"],
-            client_secret=environ["TWITTER_CLIENT_SECRET"],
-            callback_uri=environ["TWITTER_CALLBACK_URI"],
-        )
-
         self.scheduler.start()
 
         # register callback
@@ -89,8 +87,7 @@ class Tweeter(object):
 
     def log(self, mmsi, message):
         if self.logging:
-            shipname = self.tracker[mmsi]["shipname"]
-            print("[{}] {}: {}".format(str(datetime.datetime.now()), shipname, message))
+            print(f"[{datetime.datetime.now()}] {self.shipname(mmsi)}: {message}")
 
     def check(self, mmsi, t):
         crossing, depth = self.tracker.crossing(mmsi, self.direction)
@@ -106,7 +103,7 @@ class Tweeter(object):
             self.schedule[mmsi] = self.scheduler.enter(
                 delta, 1, self.snap_and_tweet, arguments=(mmsi, depth)
             )
-            self.log(mmsi, "scheduled for tweet in {} seconds".format(delta))
+            self.log(mmsi, f"scheduled for tweet in {delta} seconds")
 
     def purge_schedule(self, mmsi):
         try:
@@ -128,23 +125,56 @@ class Tweeter(object):
             large = self.tracker.dimensions(mmsi)[0] > (0.542915 * depth)
 
             # grab the image
-            image_path = os.path.join("/tmp", "{}.jpg".format(mmsi))
+            image_path = os.path.join("/tmp", f"{mmsi}.jpg")
             if not self.snap(image_path, large):
                 self.log(mmsi, "image capture aborted")
                 return
-            self.log(mmsi, "image captured to {}".format(image_path))
+            resize_and_compress(image_path, image_path, 1000000, (1640, 1232))
+            self.log(mmsi, f"image captured to {image_path}")
 
-            # tweet the image with info
-            lat, lon = self.tracker.center_coords(mmsi)
+            # set up Bluesky connection
+            username = os.getenv("BLUESKY_USERNAME")
+            password = os.getenv("BLUESKY_PASSWORD")
+            client = Client("https://bsky.social")
+            client.login(username, password)
+
+            # create post
             try:
-                self.twitter.tweet(
-                    text=self.generate_text(mmsi),
-                    image_path=image_path,
-                    lat=lat,
-                    long=lon,
+                shipname = self.shipname(mmsi)
+
+                with open(image_path, "rb") as image_file:
+                    upload = client.upload_blob(image_file)
+                images = [
+                    models.AppBskyEmbedImages.Image(alt=shipname, image=upload.blob)
+                ]
+                embed = models.AppBskyEmbedImages.Main(images=images)
+
+                text = self.generate_text(mmsi)
+
+                url = f"https://www.marinetraffic.com/en/ais/details/ships/mmsi:{mmsi}"
+                facets = [
+                    {
+                        "index": {"byteStart": 9, "byteEnd": 9 + len(shipname)},
+                        "features": [
+                            {"$type": "app.bsky.richtext.facet#link", "uri": url}
+                        ],
+                    }
+                ]
+
+                client.com.atproto.repo.create_record(
+                    models.ComAtprotoRepoCreateRecord.Data(
+                        repo=client.me.did,
+                        collection=models.ids.AppBskyFeedPost,
+                        record=models.AppBskyFeedPost.Record(
+                            created_at=client.get_current_time_iso(),
+                            text=text,
+                            embed=embed,
+                            facets=facets,
+                        ),
+                    )
                 )
             except Exception as e:
-                self.log(mmsi, "tweet error: {}".format(e))
+                self.log(mmsi, f"post error: {e}")
 
             # clean up the image
             os.remove(image_path)
@@ -154,16 +184,16 @@ class Tweeter(object):
 
             # announce the ship using TTS
             if self.tts:
-                shipname = self.tracker[mmsi]["shipname"]
-                if shipname:
-                    speech_path = os.path.join("/tmp", "{}.mp3".format(mmsi))
-                    try:
-                        speech = gtts.gTTS(text=shipname.title(), lang="en", slow=False)
-                        speech.save(speech_path)
-                        os.system("mpg321 -q {}".format(speech_path))
-                        os.remove(speech_path)
-                    except gtts.tts.gTTSError:
-                        pass
+                speech_path = os.path.join("/tmp", f"{mmsi}.mp3")
+                try:
+                    speech = gtts.gTTS(
+                        text=self.shipname(mmsi).title(), lang="en", slow=False
+                    )
+                    speech.save(speech_path)
+                    os.system(f"mpg321 -q {speech_path}")
+                    os.remove(speech_path)
+                except gtts.tts.gTTSError:
+                    pass
 
         self.log(mmsi, "done tweeting")
 
@@ -205,47 +235,36 @@ class Tweeter(object):
             pytz.timezone(self.location.timezone)
         )
 
+    def shipname(self, mmsi):
+        return self.tracker[mmsi]["shipname"] or "(Unidentified)"
+
     def generate_text(self, mmsi):
         text = ""
 
         flag = self.tracker.flag(mmsi)
         if flag:
-            text += "{} ".format(flag)
+            text += f"{flag} "
 
         ship = self.tracker[mmsi]
 
-        shipname = ship["shipname"]
-        if shipname:
-            text += shipname
-        else:
-            text += "(Unidentified)"
-
-        text += ", {}".format(self.tracker.ship_type(mmsi))
+        text += self.shipname(mmsi)
+        text += f", {self.tracker.ship_type(mmsi)}"
 
         length, width = self.tracker.dimensions(mmsi)
         if length > 0 and width > 0:
-            text += " ({l} x {w} m)".format(l=length, w=width)
+            text += f" ({length} x {width} m)"
 
         status = self.tracker.status(mmsi)
         if status is not None:
-            text += ", {}".format(status)
+            text += f", {status}"
 
         destination = ship["destination"]
         if destination:
-            text += ", destination: {}".format(destination)
+            text += f", destination: {destination}"
 
         course = ship["course"]
         speed = ship["speed"]
         if course is not None and speed is not None:
-            text += ", course: {c:.1f} \N{DEGREE SIGN} / speed: {s:.1f} kn".format(
-                c=course, s=speed
-            )
-
-        text += " https://www.marinetraffic.com/en/ais/details/ships/mmsi:{}".format(
-            mmsi
-        )
-
-        for hashtag in self.hashtags:
-            text += " #{}".format(hashtag)
+            text += f", course: {course:.1f} \N{DEGREE SIGN} / speed: {speed:.1f} kn"
 
         return text

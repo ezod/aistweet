@@ -1,4 +1,4 @@
-`aistweet`, a Twitter photo bot for Raspberry Pi AIS tracking stations
+`aistweet`, a Bluesky photo bot for Raspberry Pi AIS tracking stations
 ----------------------------------------------------------------------
 
 aistweet tracks ships via AIS and takes their picture with a Raspberry Pi
@@ -35,7 +35,7 @@ usage: aistweet.py [-h] [--host HOST] [--port PORT] [--db DB]
                    [--hashtags HASHTAGS [HASHTAGS ...]] [--tts]
                    latitude longitude
 
-Raspberry Pi AIS tracker/camera Twitter bot
+Raspberry Pi AIS tracker/camera Bluesky bot
 
 positional arguments:
   latitude              AIS station latitude
@@ -47,34 +47,18 @@ optional arguments:
   --host HOST           host for receiving UDP AIS messages
   --port PORT           port for receiving UDP AIS messages
   --db DB               database file for static ship data
-  --hashtags HASHTAGS [HASHTAGS ...]
-                        hashtags to add to tweets
   --tts                 announce ship name via text-to-speech
   --light               disable night snapshots via light sensor
 
 required environment variables:
-  TWITTER_CONSUMER_API_KEY
-  TWITTER_CONSUMER_API_KEY_SECRET
-  TWITTER_ACCESS_TOKEN
-  TWITTER_ACCESS_TOKEN_SECRET
-  TWITTER_CLIENT_ID
-  TWITTER_CLIENT_SECRET
-  TWITTER_CALLBACK_URI
+  BLUESKY_USERNAME
+  BLUESKY_PASSWORD
 ```
-
-How To Authenticate With Twitter
---------------------------------
-
-Follow the instructions on the [tweeter-basic] repository to:
-- create a Twitter v2 API project
-- generate the required keys to be set as environment variables
-  - note: the callback URI is recommended to be http://localhost/callback
-- generate the required token by doing a 1-time self-hosted browser authentication
-  - note: the token is auto-refreshed with every tweet.  However, if the token isn't refreshed in 6 months it will require user intervention to be re-generated.
 
 Dependencies
 ------------
   - [astral](https://pypi.org/project/astral/)
+  - [atproto](https://pypi.org/project/atproto/)
   - [emoji-country-flag](https://pypi.org/project/emoji-country-flag/)
   - [event-scheduler](https://pypi.org/project/event-scheduler/)
   - [geopy](https://pypi.org/project/geopy/)
@@ -83,11 +67,10 @@ Dependencies
   - [pyais](https://pypi.org/project/pyais/)
   - [pytz](https://pypi.org/project/pytz/)
   - [timezonefinder](https://pypi.org/project/timezonefinder/)
-  - [tweeter-basic]
   - [adafruit-circuitpython-veml7700](https://pypi.org/project/adafruit-circuitpython-veml7700/) (optional)
   - [gTTS](https://pypi.org/project/gTTS/) (optional)
 
-[Detroit River Boat Tracker]: https://twitter.com/detroitships
+[Detroit River Boat Tracker]: https://bsky.app/profile/detroitriverboats.bsky.social
 [AIS]: https://en.wikipedia.org/wiki/Automatic_identification_system
 [Nooelec NESDR Smart v4]: https://www.nooelec.com/store/sdr/sdr-receivers/nesdr-smart-sdr.html
 [Raspberry Pi]: https://www.raspberrypi.org/
@@ -95,5 +78,4 @@ Dependencies
 [Adafruit VEML7700]: http://learn.adafruit.com/adafruit-veml7700
 [AIS Dispatcher for Linux]: https://www.aishub.net/ais-dispatcher?tab=linux
 [rtl-ais]: https://github.com/dgiardini/rtl-ais
-[tweeter-basic]: https://github.com/MikeBusuttil/tweeter-basic
 [how it was made]: https://www.prosiglieres.com/posts/detroit-river-boat-tracker-project/
