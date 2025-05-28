@@ -136,7 +136,18 @@ class Tweeter(object):
             username = os.getenv("BLUESKY_USERNAME")
             password = os.getenv("BLUESKY_PASSWORD")
             client = Client("https://bsky.social")
-            client.login(username, password)
+
+            for attempt in range(1, 6):
+                try:
+                    client.login(username, password)
+                    break
+                except NetworkError as e:
+                    self.log(mmsi, f"login attempt {attempt} failed: {e}")
+                    if attempt == 5:
+                        raise
+                    sleep_time = 2 * (2 ** (attempt - 1))
+                    self.log(mmsi, f"retrying in {sleep_time} seconds...")
+                    time.sleep(sleep_time)
 
             # create post
             try:
