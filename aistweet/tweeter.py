@@ -141,10 +141,10 @@ class Tweeter(object):
                 try:
                     client.login(username, password)
                     break
-                except NetworkError as e:
+                except Exception as e:
                     self.log(mmsi, f"login attempt {attempt} failed: {e}")
                     if attempt == 5:
-                        raise
+                        return
                     sleep_time = 2 * (2 ** (attempt - 1))
                     self.log(mmsi, f"retrying in {sleep_time} seconds...")
                     time.sleep(sleep_time)
