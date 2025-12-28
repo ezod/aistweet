@@ -162,7 +162,7 @@ class Tweeter(object):
 
                 text = self.generate_text(mmsi)
 
-                url = f"https://www.marinetraffic.com/en/ais/details/ships/mmsi:{mmsi}"
+                url = f"https://www.vesselfinder.com/vessels/details/{mmsi}"
                 facets = [
                     {
                         "index": {"byteStart": 9, "byteEnd": 9 + len(shipname)},
